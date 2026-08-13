@@ -22,8 +22,6 @@
 
 #include <astal-auth.h>
 
-/* The PAM service installed to /etc/pam.d. The astal-auth default is not
- * guaranteed to exist. */
 #define PAM_SERVICE "unity-lock"
 
 struct _UnityLockConversation
@@ -36,11 +34,9 @@ struct _UnityLockConversation
   gboolean      busy;
 };
 
-enum {
-  PROP_0,
-  PROP_BUSY,
-  N_PROPS,
-};
+typedef enum {
+  PROP_BUSY = 1,
+} UnityLockConversationProps;
 
 enum {
   SIGNAL_PROMPT,
@@ -50,7 +46,7 @@ enum {
   N_SIGNALS,
 };
 
-static GParamSpec *props[N_PROPS];
+static GParamSpec *props[PROP_BUSY + 1];
 static guint signals[N_SIGNALS];
 
 G_DEFINE_FINAL_TYPE (UnityLockConversation, unity_lock_conversation, G_TYPE_OBJECT)
@@ -105,8 +101,6 @@ on_prompt_visible (AstalAuthPam *pam,
 
   (void) pam;
 
-  /* A visible prompt is asking for something other than the password that was
-   * typed, so the held secret is no longer an answer to anything. */
   g_clear_pointer (&self->secret, g_free);
 
   report_prompt (self, message, TRUE);
@@ -177,8 +171,7 @@ unity_lock_conversation_submit (UnityLockConversation *self,
       return;
     }
 
-  g_free (self->secret);
-  self->secret = g_strdup (text);
+  g_set_str (&self->secret, text);
 
   set_busy (self, TRUE);
   astal_auth_pam_start_authenticate (self->pam);
@@ -211,14 +204,13 @@ unity_lock_conversation_get_property (GObject    *object,
 {
   UnityLockConversation *self = UNITY_LOCK_CONVERSATION (object);
 
-  switch (prop_id)
+  (void) pspec;
+
+  switch ((UnityLockConversationProps) prop_id)
     {
     case PROP_BUSY:
       g_value_set_boolean (value, self->busy);
       break;
-
-    default:
-      G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
     }
 }
 
@@ -250,7 +242,7 @@ unity_lock_conversation_class_init (UnityLockConversationClass *klass)
     g_param_spec_boolean ("busy", NULL, NULL, FALSE,
                           G_PARAM_READABLE | G_PARAM_EXPLICIT_NOTIFY | G_PARAM_STATIC_STRINGS);
 
-  g_object_class_install_properties (object_class, N_PROPS, props);
+  g_object_class_install_properties (object_class, G_N_ELEMENTS (props), props);
 
   /**
    * UnityLockConversation::prompt:

@@ -1,0 +1,24 @@
+/* Floor under the pages, so a surface with no published wallpaper stays dark. */
+.unity-lock {
+  background-color: #16161a;
+}
+
+row.body .title {
+  font-weight: normal;
+}
+
+.unity-lock-text {
+  color: #ffffff;
+}
+
+.unity-lock-prompt {
+  --accent-bg-color: rgb(255 255 255 / 75%);
+  --accent-fg-color: rgb(0 0 0 / 75%);
+  --accent-color: rgb(255 255 255 / 75%);
+}
+
+.unity-lock-prompt list.boxed-list {
+  background-color: rgb(255 255 255 / 8%);
+  color: #ffffff;
+  font-weight: normal;
+}

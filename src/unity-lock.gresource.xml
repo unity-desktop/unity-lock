@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gresources>
+  <gresource prefix="/org/unity/Lock">
+    <file compressed="true" preprocess="xml-stripblanks">unity-lock.ui</file>
+    <file compressed="true" preprocess="xml-stripblanks" alias="unity-lock-datetime.ui">components/unity-lock-datetime.ui</file>
+    <file compressed="true" preprocess="xml-stripblanks" alias="unity-lock-datetime-page.ui">components/unity-lock-datetime-page.ui</file>
+    <file compressed="true" preprocess="xml-stripblanks" alias="unity-lock-user-page.ui">components/unity-lock-user-page.ui</file>
+    <file compressed="true" alias="unity-lock-datetime.css">components/unity-lock-datetime.css</file>
+    <file compressed="true">style.css</file>
+
+    <file compressed="true">fonts/fraunces.ttf</file>
+    <file compressed="true">fonts/bitcount-prop-single.ttf</file>
+    <file compressed="true">fonts/press-start-2p.ttf</file>
+    <file compressed="true">fonts/sixtyfour.ttf</file>
+    <file compressed="true">fonts/audiowide.ttf</file>
+    <file compressed="true">fonts/michroma.ttf</file>
+    <file compressed="true">fonts/tourney.ttf</file>
+    <file compressed="true">fonts/bagel-fat-one.ttf</file>
+    <file compressed="true">fonts/dynapuff.ttf</file>
+    <file compressed="true">fonts/kablammo.ttf</file>
+    <file compressed="true">fonts/rubik-glitch.ttf</file>
+    <file compressed="true">fonts/ewert.ttf</file>
+    <file compressed="true">fonts/limelight.ttf</file>
+    <file compressed="true">fonts/climate-crisis.ttf</file>
+  </gresource>
+</gresources>

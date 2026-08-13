@@ -104,9 +104,9 @@ gdouble unity_lock_datetime_get_scale (UnityLockDatetime *self);
  * Sets how large the time is drawn, as a multiple of the theme font size. The
  * date is unaffected and keeps its own style class.
  *
- * This exists so an #AdwBreakpoint can drive it. Sizing the clock by width is
- * the only way to keep it from overflowing a narrow surface, and the widest
- * bundled face draws the 12 hour string at 72px per unit of scale.
+ * This exists so an #AdwBreakpoint can drive it. Faces differ enough in advance
+ * width that a fixed size overflows a narrow surface, so the scale has to follow
+ * the width available.
  */
 void unity_lock_datetime_set_scale (UnityLockDatetime *self,
                                     gdouble            scale);

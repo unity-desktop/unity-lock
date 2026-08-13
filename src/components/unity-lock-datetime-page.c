@@ -20,19 +20,19 @@
 
 #include "unity-lock-datetime-page.h"
 
+#include "unity-lock-background.h"
 #include "unity-lock-datetime.h"
 
-/* On the scale setters in the template: the clock is sized by width, because the
- * widest bundled face draws "10:25 PM" at 72px per unit of scale and would
- * otherwise run off a narrow surface. The largest scale that still fits is
- * (width - 48) / 72, which gives 4.9 at 400sp, 7.7 at 600sp and 11.8 at 900sp.
- * Those are rounded down in the template for breathing room. The formula keeps
- * growing above 900sp, so the default is capped at 14 to stop the clock
- * swallowing a large screen. Remeasure with demo/ if a wider face is added. */
+/* The template scales the clock by width. Faces differ enough in advance width
+ * that a fixed size overflows a narrow surface, so each breakpoint sets the
+ * largest scale the widest face still fits in. Above the last breakpoint the
+ * default caps the clock rather than letting it grow with the screen. */
 
 struct _UnityLockDatetimePage
 {
   AdwBin parent_instance;
+
+  GtkPicture *wallpaper;
 
   UnityLockDatetime *datetime;
 };
@@ -48,6 +48,7 @@ unity_lock_datetime_page_class_init (UnityLockDatetimePageClass *klass)
 
   gtk_widget_class_set_template_from_resource (widget_class,
                                                "/org/unity/Lock/unity-lock-datetime-page.ui");
+  gtk_widget_class_bind_template_child (widget_class, UnityLockDatetimePage, wallpaper);
   gtk_widget_class_bind_template_child (widget_class, UnityLockDatetimePage, datetime);
 }
 
@@ -55,6 +56,8 @@ static void
 unity_lock_datetime_page_init (UnityLockDatetimePage *self)
 {
   gtk_widget_init_template (GTK_WIDGET (self));
+
+  gtk_picture_set_paintable (self->wallpaper, unity_lock_background_get ());
 }
 
 GtkWidget *

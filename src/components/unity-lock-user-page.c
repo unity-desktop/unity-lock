@@ -24,11 +24,14 @@
 #include <glib/gi18n.h>
 #include <string.h>
 
+#include "unity-lock-background.h"
 #include "unity-lock-conversation.h"
 
 struct _UnityLockUserPage
 {
   AdwBin parent_instance;
+
+  GtkPicture *wallpaper;
 
   AdwAvatar           *avatar;
   GtkLabel            *name_label;
@@ -314,6 +317,7 @@ unity_lock_user_page_class_init (UnityLockUserPageClass *klass)
 
   gtk_widget_class_set_template_from_resource (widget_class,
                                                "/org/unity/Lock/unity-lock-user-page.ui");
+  gtk_widget_class_bind_template_child (widget_class, UnityLockUserPage, wallpaper);
   gtk_widget_class_bind_template_child (widget_class, UnityLockUserPage, avatar);
   gtk_widget_class_bind_template_child (widget_class, UnityLockUserPage, name_label);
   gtk_widget_class_bind_template_child (widget_class, UnityLockUserPage, message);
@@ -328,6 +332,8 @@ static void
 unity_lock_user_page_init (UnityLockUserPage *self)
 {
   gtk_widget_init_template (GTK_WIDGET (self));
+
+  gtk_picture_set_paintable (self->wallpaper, unity_lock_background_get ());
 }
 
 GtkWidget *

@@ -6,6 +6,13 @@
     <property name="hexpand">true</property>
     <property name="vexpand">true</property>
     <property name="child">
+      <object class="GtkOverlay">
+        <property name="child">
+          <object class="GtkPicture" id="wallpaper">
+            <property name="content-fit">cover</property>
+          </object>
+        </property>
+        <child type="overlay">
       <object class="AdwBreakpointBin">
         <property name="hexpand">true</property>
         <property name="vexpand">true</property>
@@ -56,6 +63,8 @@
             </child>
           </object>
         </property>
+      </object>
+        </child>
       </object>
     </property>
   </template>

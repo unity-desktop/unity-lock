@@ -23,11 +23,6 @@
 #include "unity-lock-background.h"
 #include "unity-lock-datetime.h"
 
-/* The template scales the clock by width. Faces differ enough in advance width
- * that a fixed size overflows a narrow surface, so each breakpoint sets the
- * largest scale the widest face still fits in. Above the last breakpoint the
- * default caps the clock rather than letting it grow with the screen. */
-
 struct _UnityLockDatetimePage
 {
   AdwBin parent_instance;

@@ -28,8 +28,7 @@
 typedef struct
 {
   const gchar *label;
-  const gchar *category;   /* NULL for the default face */
-} FaceSpec;
+  const gchar *category;} FaceSpec;
 
 static const FaceSpec specs[] = {
   [UNITY_LOCK_FONT_FACE_STYLE_DEFAULT]              = { "Default", NULL },
@@ -79,16 +78,14 @@ struct _UnityLockFontFace
   gboolean        failed;
 };
 
-enum {
-  PROP_0,
-  PROP_STYLE,
+typedef enum {
+  PROP_STYLE = 1,
   PROP_NICK,
   PROP_LABEL,
   PROP_CATEGORY,
-  N_PROPS,
-};
+} UnityLockFontFaceProps;
 
-static GParamSpec *props[N_PROPS];
+static GParamSpec *props[PROP_CATEGORY + 1];
 
 G_DEFINE_FINAL_TYPE (UnityLockFontFace, unity_lock_font_face, G_TYPE_OBJECT)
 
@@ -132,7 +129,9 @@ unity_lock_font_face_get_property (GObject    *object,
 {
   UnityLockFontFace *self = UNITY_LOCK_FONT_FACE (object);
 
-  switch (prop_id)
+  (void) pspec;
+
+  switch ((UnityLockFontFaceProps) prop_id)
     {
     case PROP_STYLE:
       g_value_set_enum (value, unity_lock_font_face_get_style (self));
@@ -149,9 +148,6 @@ unity_lock_font_face_get_property (GObject    *object,
     case PROP_CATEGORY:
       g_value_set_string (value, self->spec->category);
       break;
-
-    default:
-      G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
     }
 }
 
@@ -200,7 +196,7 @@ unity_lock_font_face_class_init (UnityLockFontFaceClass *klass)
     g_param_spec_string ("category", NULL, NULL, NULL,
                          G_PARAM_READABLE | G_PARAM_STATIC_STRINGS);
 
-  g_object_class_install_properties (object_class, N_PROPS, props);
+  g_object_class_install_properties (object_class, G_N_ELEMENTS (props), props);
 }
 
 static void
@@ -225,9 +221,6 @@ unity_lock_font_face_get_all (void)
           GEnumValue *style = g_enum_get_value (styles, (gint) i);
 
           face->spec = &specs[i];
-          /* The enum is the only place a nick is written. It is also the CSS
-           * class and the font filename, so taking it from here keeps those from
-           * drifting apart. The string is a literal owned by the enum class. */
           face->nick = style->value_nick;
           g_list_store_append (faces, face);
         }
@@ -248,8 +241,6 @@ unity_lock_font_face_for_style (UnityLockFontFaceStyle style)
   if ((guint) style >= g_list_model_get_n_items (model))
     style = UNITY_LOCK_FONT_FACE_STYLE_DEFAULT;
 
-  /* The store keeps a reference for the process lifetime, so returning a
-   * borrowed pointer is safe. */
   g_autoptr (UnityLockFontFace) face = g_list_model_get_item (model, style);
 
   return face;
@@ -281,10 +272,6 @@ staged_fonts_clear (void)
   g_clear_pointer (&staged_fonts, g_ptr_array_unref);
 }
 
-/* Pango can only register a font from a path and fontconfig here has no call to
- * add one from memory, so a bundled font has to reach the disk first. GTK does
- * the same in gsk/gskrendernodeparser.c. Fontconfig may reread a font lazily, so
- * the files are only removed at process exit. */
 static gboolean
 register_font (GBytes      *bytes,
                const gchar *resource)

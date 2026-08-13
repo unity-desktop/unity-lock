@@ -1,0 +1,8 @@
+# See https://bilelmoussaoui.github.io/gobject-linter/ for rule reference.
+
+default_level = "error"
+
+ignore = [
+  "build/**",
+  "subprojects/**",
+]

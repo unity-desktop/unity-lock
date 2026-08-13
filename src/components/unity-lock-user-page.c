@@ -20,9 +20,10 @@
 
 #include "unity-lock-user-page.h"
 
+#include <string.h>
+
 #include <act/act.h>
 #include <glib/gi18n.h>
-#include <string.h>
 
 #include "unity-lock-background.h"
 #include "unity-lock-conversation.h"
@@ -53,9 +54,6 @@ static guint signals[N_SIGNALS];
 
 G_DEFINE_FINAL_TYPE (UnityLockUserPage, unity_lock_user_page, ADW_TYPE_BIN)
 
-/* PAM writes prompts for a terminal, so they arrive as "Password: " and the like.
- * Strip the trailing colon and surrounding space to get something that reads as a
- * field label, and fall back to our own wording when nothing usable is left. */
 static gchar *
 prompt_title (const gchar *message)
 {
@@ -101,7 +99,6 @@ show_message (UnityLockUserPage *self,
   gtk_widget_set_visible (GTK_WIDGET (self->message), TRUE);
 }
 
-/* Back to a field that is ready for another attempt. */
 static void
 reset_entry (UnityLockUserPage *self)
 {
@@ -180,7 +177,6 @@ on_unlock_clicked (AdwButtonRow *row,
   submit (UNITY_LOCK_USER_PAGE (user_data));
 }
 
-/* The real name when the account has one, otherwise the login name. */
 static const gchar *
 display_name (ActUser *user)
 {

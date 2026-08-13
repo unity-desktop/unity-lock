@@ -42,15 +42,13 @@ struct _UnityLockDatetime
   GSettings      *lock;
 };
 
-enum {
-  PROP_0,
-  PROP_STYLE,
+typedef enum {
+  PROP_STYLE = 1,
   PROP_SHOW_DATE,
   PROP_SCALE,
-  N_PROPS,
-};
+} UnityLockDatetimeProps;
 
-static GParamSpec *props[N_PROPS];
+static GParamSpec *props[PROP_SCALE + 1];
 
 G_DEFINE_FINAL_TYPE (UnityLockDatetime, unity_lock_datetime, ADW_TYPE_BIN)
 
@@ -218,7 +216,9 @@ unity_lock_datetime_get_property (GObject    *object,
 {
   UnityLockDatetime *self = UNITY_LOCK_DATETIME (object);
 
-  switch (prop_id)
+  (void) pspec;
+
+  switch ((UnityLockDatetimeProps) prop_id)
     {
     case PROP_STYLE:
       g_value_set_enum (value, self->style);
@@ -231,9 +231,6 @@ unity_lock_datetime_get_property (GObject    *object,
     case PROP_SCALE:
       g_value_set_double (value, self->scale);
       break;
-
-    default:
-      G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
     }
 }
 
@@ -245,7 +242,9 @@ unity_lock_datetime_set_property (GObject      *object,
 {
   UnityLockDatetime *self = UNITY_LOCK_DATETIME (object);
 
-  switch (prop_id)
+  (void) pspec;
+
+  switch ((UnityLockDatetimeProps) prop_id)
     {
     case PROP_STYLE:
       unity_lock_datetime_set_style (self, g_value_get_enum (value));
@@ -258,9 +257,6 @@ unity_lock_datetime_set_property (GObject      *object,
     case PROP_SCALE:
       unity_lock_datetime_set_scale (self, g_value_get_double (value));
       break;
-
-    default:
-      G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
     }
 }
 
@@ -276,8 +272,6 @@ unity_lock_datetime_constructed (GObject *object)
   g_signal_connect_object (self->interface, "changed::clock-format",
                            G_CALLBACK (update_time), self, G_CONNECT_SWAPPED);
 
-  /* g_settings_new() aborts on a missing schema, so an uninstalled build has to
-   * look the schema up first. */
   source = g_settings_schema_source_get_default ();
 
   g_autoptr (GSettingsSchema) schema =
@@ -367,7 +361,7 @@ unity_lock_datetime_class_init (UnityLockDatetimeClass *klass)
                          0.1, 100.0, 14.0,
                          G_PARAM_READWRITE | G_PARAM_EXPLICIT_NOTIFY | G_PARAM_STATIC_STRINGS);
 
-  g_object_class_install_properties (object_class, N_PROPS, props);
+  g_object_class_install_properties (object_class, G_N_ELEMENTS (props), props);
 
   gtk_widget_class_set_template_from_resource (widget_class,
                                                "/org/unity/Lock/unity-lock-datetime.ui");

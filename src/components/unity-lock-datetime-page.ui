@@ -57,7 +57,6 @@
                 <property name="margin-bottom">24</property>
                 <style>
                   <class name="unity-lock-text"/>
-                  <class name="unity-lock-hint"/>
                 </style>
               </object>
             </child>

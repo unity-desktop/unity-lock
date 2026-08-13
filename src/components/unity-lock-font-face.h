@@ -135,7 +135,7 @@ UnityLockFontFaceStyle unity_lock_font_face_get_style (UnityLockFontFace *self);
  *
  * Returns: (transfer none): the nick.
  */
-const char *unity_lock_font_face_get_nick (UnityLockFontFace *self);
+const gchar *unity_lock_font_face_get_nick (UnityLockFontFace *self);
 
 /**
  * unity_lock_font_face_get_label:
@@ -145,7 +145,7 @@ const char *unity_lock_font_face_get_nick (UnityLockFontFace *self);
  *
  * Returns: (transfer none): the display name.
  */
-const char *unity_lock_font_face_get_label (UnityLockFontFace *self);
+const gchar *unity_lock_font_face_get_label (UnityLockFontFace *self);
 
 /**
  * unity_lock_font_face_get_category:
@@ -156,7 +156,7 @@ const char *unity_lock_font_face_get_label (UnityLockFontFace *self);
  *
  * Returns: (transfer none) (nullable): the category name.
  */
-const char *unity_lock_font_face_get_category (UnityLockFontFace *self);
+const gchar *unity_lock_font_face_get_category (UnityLockFontFace *self);
 
 /**
  * unity_lock_font_face_load:

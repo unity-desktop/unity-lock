@@ -1,6 +1,6 @@
 /* Floor under the pages, so a surface with no published wallpaper stays dark. */
 .unity-lock {
-  background-color: #16161a;
+  background-color: var(--dark-4);
 }
 
 row.body .title {
@@ -8,30 +8,30 @@ row.body .title {
 }
 
 .unity-lock-text {
-  color: #ffffff;
+  color: var(--light-1);
 }
 
 .unity-lock-prompt {
-  --accent-bg-color: rgb(255 255 255 / 75%);
-  --accent-fg-color: rgb(0 0 0 / 75%);
-  --accent-color: rgb(255 255 255 / 75%);
+  --accent-bg-color: var(--light-1);
+  --accent-fg-color: var(--dark-5);
+  --accent-color: var(--light-1);
 }
 
 .unity-lock-prompt list.boxed-list {
-  background-color: rgb(255 255 255 / 8%);
-  color: #ffffff;
+  background-color: alpha(var(--light-1), 0.08);
+  color: var(--light-1);
   font-weight: normal;
 }
 
 .unity-lock-back {
-  background-color: rgb(255 255 255 / 22%);
-  color: #ffffff;
+  background-color: alpha(var(--light-1), 0.22);
+  color: var(--light-1);
 }
 
 .unity-lock-back:hover {
-  background-color: rgb(255 255 255 / 30%);
+  background-color: alpha(var(--light-1), 0.30);
 }
 
 .unity-lock-back:active {
-  background-color: rgb(255 255 255 / 38%);
+  background-color: alpha(var(--light-1), 0.38);
 }

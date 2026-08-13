@@ -27,27 +27,26 @@
 
 typedef struct
 {
-  const gchar *nick;
   const gchar *label;
-  const gchar *category;
+  const gchar *category;   /* NULL for the default face */
 } FaceSpec;
 
 static const FaceSpec specs[] = {
-  [UNITY_LOCK_FONT_FACE_STYLE_DEFAULT]              = { "default", "Default", NULL },
-  [UNITY_LOCK_FONT_FACE_STYLE_FRAUNCES]             = { "fraunces", "Fraunces", "Serif" },
-  [UNITY_LOCK_FONT_FACE_STYLE_BITCOUNT_PROP_SINGLE] = { "bitcount-prop-single", "Bitcount", "Pixel" },
-  [UNITY_LOCK_FONT_FACE_STYLE_PRESS_START_2P]       = { "press-start-2p", "Press Start 2P", "Pixel" },
-  [UNITY_LOCK_FONT_FACE_STYLE_SIXTYFOUR]            = { "sixtyfour", "Sixtyfour", "Pixel" },
-  [UNITY_LOCK_FONT_FACE_STYLE_AUDIOWIDE]            = { "audiowide", "Audiowide", "Futuristic" },
-  [UNITY_LOCK_FONT_FACE_STYLE_MICHROMA]             = { "michroma", "Michroma", "Futuristic" },
-  [UNITY_LOCK_FONT_FACE_STYLE_TOURNEY]              = { "tourney", "Tourney", "Futuristic" },
-  [UNITY_LOCK_FONT_FACE_STYLE_BAGEL_FAT_ONE]        = { "bagel-fat-one", "Bagel Fat One", "Playful" },
-  [UNITY_LOCK_FONT_FACE_STYLE_DYNAPUFF]             = { "dynapuff", "DynaPuff", "Playful" },
-  [UNITY_LOCK_FONT_FACE_STYLE_KABLAMMO]             = { "kablammo", "Kablammo", "Playful" },
-  [UNITY_LOCK_FONT_FACE_STYLE_RUBIK_GLITCH]         = { "rubik-glitch", "Rubik Glitch", "Playful" },
-  [UNITY_LOCK_FONT_FACE_STYLE_EWERT]                = { "ewert", "Ewert", "Retro" },
-  [UNITY_LOCK_FONT_FACE_STYLE_LIMELIGHT]            = { "limelight", "Limelight", "Retro" },
-  [UNITY_LOCK_FONT_FACE_STYLE_CLIMATE_CRISIS]       = { "climate-crisis", "Climate Crisis", "Expressive" },
+  [UNITY_LOCK_FONT_FACE_STYLE_DEFAULT]              = { "Default", NULL },
+  [UNITY_LOCK_FONT_FACE_STYLE_FRAUNCES]             = { "Fraunces", "Serif" },
+  [UNITY_LOCK_FONT_FACE_STYLE_BITCOUNT_PROP_SINGLE] = { "Bitcount", "Pixel" },
+  [UNITY_LOCK_FONT_FACE_STYLE_PRESS_START_2P]       = { "Press Start 2P", "Pixel" },
+  [UNITY_LOCK_FONT_FACE_STYLE_SIXTYFOUR]            = { "Sixtyfour", "Pixel" },
+  [UNITY_LOCK_FONT_FACE_STYLE_AUDIOWIDE]            = { "Audiowide", "Futuristic" },
+  [UNITY_LOCK_FONT_FACE_STYLE_MICHROMA]             = { "Michroma", "Futuristic" },
+  [UNITY_LOCK_FONT_FACE_STYLE_TOURNEY]              = { "Tourney", "Futuristic" },
+  [UNITY_LOCK_FONT_FACE_STYLE_BAGEL_FAT_ONE]        = { "Bagel Fat One", "Playful" },
+  [UNITY_LOCK_FONT_FACE_STYLE_DYNAPUFF]             = { "DynaPuff", "Playful" },
+  [UNITY_LOCK_FONT_FACE_STYLE_KABLAMMO]             = { "Kablammo", "Playful" },
+  [UNITY_LOCK_FONT_FACE_STYLE_RUBIK_GLITCH]         = { "Rubik Glitch", "Playful" },
+  [UNITY_LOCK_FONT_FACE_STYLE_EWERT]                = { "Ewert", "Retro" },
+  [UNITY_LOCK_FONT_FACE_STYLE_LIMELIGHT]            = { "Limelight", "Retro" },
+  [UNITY_LOCK_FONT_FACE_STYLE_CLIMATE_CRISIS]       = { "Climate Crisis", "Expressive" },
 };
 
 G_STATIC_ASSERT (G_N_ELEMENTS (specs) == UNITY_LOCK_FONT_FACE_STYLE_CLIMATE_CRISIS + 1);
@@ -75,6 +74,7 @@ struct _UnityLockFontFace
   GObject parent_instance;
 
   const FaceSpec *spec;
+  const gchar    *nick;
   gboolean        loaded;
   gboolean        failed;
 };
@@ -105,7 +105,7 @@ unity_lock_font_face_get_nick (UnityLockFontFace *self)
 {
   g_return_val_if_fail (UNITY_LOCK_IS_FONT_FACE (self), NULL);
 
-  return self->spec->nick;
+  return self->nick;
 }
 
 const gchar *
@@ -139,7 +139,7 @@ unity_lock_font_face_get_property (GObject    *object,
       break;
 
     case PROP_NICK:
-      g_value_set_string (value, self->spec->nick);
+      g_value_set_string (value, self->nick);
       break;
 
     case PROP_LABEL:
@@ -217,14 +217,22 @@ unity_lock_font_face_get_all (void)
   if (g_once_init_enter (&store))
     {
       GListStore *faces = g_list_store_new (UNITY_LOCK_TYPE_FONT_FACE);
+      GEnumClass *styles = g_type_class_ref (UNITY_LOCK_TYPE_FONT_FACE_STYLE);
 
       for (guint i = 0; i < G_N_ELEMENTS (specs); i++)
         {
           g_autoptr (UnityLockFontFace) face = g_object_new (UNITY_LOCK_TYPE_FONT_FACE, NULL);
+          GEnumValue *style = g_enum_get_value (styles, (gint) i);
 
           face->spec = &specs[i];
+          /* The enum is the only place a nick is written. It is also the CSS
+           * class and the font filename, so taking it from here keeps those from
+           * drifting apart. The string is a literal owned by the enum class. */
+          face->nick = style->value_nick;
           g_list_store_append (faces, face);
         }
+
+      g_type_class_unref (styles);
 
       g_once_init_leave (&store, faces);
     }
@@ -325,7 +333,7 @@ unity_lock_font_face_load (UnityLockFontFace *self)
     return self->loaded;
 
   g_autofree gchar *resource =
-    g_strconcat (FONT_RESOURCE_PREFIX, self->spec->nick, ".ttf", NULL);
+    g_strconcat (FONT_RESOURCE_PREFIX, self->nick, ".ttf", NULL);
   g_autoptr (GError) error = NULL;
   g_autoptr (GBytes) bytes =
     g_resources_lookup_data (resource, G_RESOURCE_LOOKUP_FLAGS_NONE, &error);

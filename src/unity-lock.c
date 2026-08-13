@@ -30,9 +30,7 @@ struct _UnityLock
 {
   AdwApplicationWindow parent_instance;
 
-  AdwCarousel           *carousel;
-  UnityLockDatetimePage *datetime_page;
-  UnityLockUserPage     *user_page;
+  AdwCarousel *carousel;
 
   gboolean primary;
 };
@@ -51,6 +49,12 @@ static GParamSpec *props[PROP_PRIMARY + 1];
 
 G_DEFINE_FINAL_TYPE (UnityLock, unity_lock, ADW_TYPE_APPLICATION_WINDOW)
 
+static UnityLockUserPage *
+user_page (UnityLock *self)
+{
+  return UNITY_LOCK_USER_PAGE (adw_carousel_get_nth_page (self->carousel, PAGE_LOGIN));
+}
+
 static gboolean
 on_login_page (UnityLock *self)
 {
@@ -59,7 +63,7 @@ on_login_page (UnityLock *self)
 
 static void
 scroll_to (UnityLock *self,
-           guint             index)
+           guint      index)
 {
   adw_carousel_scroll_to (self->carousel,
                           adw_carousel_get_nth_page (self->carousel, index),
@@ -76,9 +80,9 @@ reveal (UnityLock *self)
 }
 
 static void
-back_cb (GtkWidget  *widget,
+back_cb (GtkWidget   *widget,
          const gchar *action_name,
-         GVariant   *parameter)
+         GVariant    *parameter)
 {
   (void) action_name;
   (void) parameter;
@@ -94,16 +98,9 @@ on_unlocked (UnityLock *self)
 
 static void
 on_page_changed (UnityLock *self,
-                 guint             index)
+                 guint      index)
 {
-  if (index == PAGE_LOGIN)
-    {
-      unity_lock_user_page_focus_entry (self->user_page);
-      return;
-    }
-
-  unity_lock_user_page_reset (self->user_page);
-  gtk_window_set_focus (GTK_WINDOW (self), NULL);
+  unity_lock_user_page_set_active (user_page (self), index == PAGE_LOGIN);
 }
 
 static gboolean
@@ -149,7 +146,7 @@ on_key_pressed (GtkEventControllerKey *controller,
       g_autofree gchar *text = g_ucs4_to_utf8 (&unicode, 1, NULL, NULL, NULL);
 
       reveal (self);
-      unity_lock_user_page_type_into_entry (self->user_page, text);
+      unity_lock_user_page_type_into_entry (user_page (self), text);
 
       return GDK_EVENT_STOP;
     }
@@ -173,24 +170,10 @@ on_click_pressed (GtkGestureClick *gesture,
 }
 
 static void
-unity_lock_get_property (GObject    *object,
-                                 guint       prop_id,
-                                 GValue     *value,
-                                 GParamSpec *pspec)
-{
-  UnityLock *self = UNITY_LOCK (object);
-
-  if (prop_id == PROP_PRIMARY)
-    g_value_set_boolean (value, self->primary);
-  else
-    G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
-}
-
-static void
 unity_lock_set_property (GObject      *object,
-                                 guint         prop_id,
-                                 const GValue *value,
-                                 GParamSpec   *pspec)
+                         guint         prop_id,
+                         const GValue *value,
+                         GParamSpec   *pspec)
 {
   UnityLock *self = UNITY_LOCK (object);
 
@@ -215,7 +198,7 @@ unity_lock_constructed (GObject *object)
       return;
     }
 
-  g_signal_connect_object (self->user_page, "unlocked",
+  g_signal_connect_object (user_page (self), "unlocked",
                            G_CALLBACK (on_unlocked), self, G_CONNECT_SWAPPED);
   g_signal_connect_object (self->carousel, "page-changed",
                            G_CALLBACK (on_page_changed), self, G_CONNECT_SWAPPED);
@@ -228,7 +211,6 @@ unity_lock_constructed (GObject *object)
   click = gtk_gesture_click_new ();
   g_signal_connect (click, "pressed", G_CALLBACK (on_click_pressed), self);
   gtk_widget_add_controller (GTK_WIDGET (self), GTK_EVENT_CONTROLLER (click));
-
 }
 
 static void
@@ -237,7 +219,6 @@ unity_lock_class_init (UnityLockClass *klass)
   GObjectClass *object_class = G_OBJECT_CLASS (klass);
   GtkWidgetClass *widget_class = GTK_WIDGET_CLASS (klass);
 
-  object_class->get_property = unity_lock_get_property;
   object_class->set_property = unity_lock_set_property;
   object_class->constructed = unity_lock_constructed;
 
@@ -245,10 +226,12 @@ unity_lock_class_init (UnityLockClass *klass)
    * UnityLock:primary:
    *
    * Whether this surface carries the clock and the prompt. Only one monitor does.
+   *
+   * Set once at construction. Nothing reads it back, so it is write only.
    */
   props[PROP_PRIMARY] =
     g_param_spec_boolean ("primary", NULL, NULL, FALSE,
-                          G_PARAM_READWRITE | G_PARAM_CONSTRUCT_ONLY | G_PARAM_STATIC_STRINGS);
+                          G_PARAM_WRITABLE | G_PARAM_CONSTRUCT_ONLY | G_PARAM_STATIC_STRINGS);
 
   g_object_class_install_properties (object_class, G_N_ELEMENTS (props), props);
 
@@ -270,8 +253,6 @@ unity_lock_class_init (UnityLockClass *klass)
   gtk_widget_class_set_template_from_resource (widget_class,
                                                "/org/unity/Lock/unity-lock.ui");
   gtk_widget_class_bind_template_child (widget_class, UnityLock, carousel);
-  gtk_widget_class_bind_template_child (widget_class, UnityLock, datetime_page);
-  gtk_widget_class_bind_template_child (widget_class, UnityLock, user_page);
 }
 
 static void

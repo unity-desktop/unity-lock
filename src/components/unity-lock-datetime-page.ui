@@ -13,70 +13,70 @@
           </object>
         </property>
         <child type="overlay">
-      <object class="AdwBreakpointBin">
-        <property name="hexpand">true</property>
-        <property name="vexpand">true</property>
-        <property name="width-request">200</property>
-        <property name="height-request">200</property>
-        <child>
-          <object class="AdwBreakpoint">
-            <condition>max-width: 900sp</condition>
-            <setter object="datetime" property="scale">11</setter>
-          </object>
-        </child>
-        <child>
-          <object class="AdwBreakpoint">
-            <condition>max-width: 600sp</condition>
-            <setter object="datetime" property="scale">7</setter>
-          </object>
-        </child>
-        <child>
-          <object class="AdwBreakpoint">
-            <condition>max-width: 400sp</condition>
-            <setter object="datetime" property="scale">4</setter>
-          </object>
-        </child>
-        <property name="child">
-          <object class="GtkBox">
-            <property name="orientation">vertical</property>
+          <object class="AdwBreakpointBin">
             <property name="hexpand">true</property>
             <property name="vexpand">true</property>
+            <property name="width-request">200</property>
+            <property name="height-request">200</property>
             <child>
-              <object class="UnityLockDatetime" id="datetime">
-                <property name="scale">14</property>
-                <property name="hexpand">true</property>
-                <property name="vexpand">true</property>
-                <property name="valign">center</property>
+              <object class="AdwBreakpoint">
+                <condition>max-width: 900sp</condition>
+                <setter object="datetime" property="scale">11</setter>
               </object>
             </child>
             <child>
+              <object class="AdwBreakpoint">
+                <condition>max-width: 600sp</condition>
+                <setter object="datetime" property="scale">7</setter>
+              </object>
+            </child>
+            <child>
+              <object class="AdwBreakpoint">
+                <condition>max-width: 400sp</condition>
+                <setter object="datetime" property="scale">4</setter>
+              </object>
+            </child>
+            <property name="child">
               <object class="GtkBox">
                 <property name="orientation">vertical</property>
-                <property name="halign">center</property>
-                <property name="valign">end</property>
-                <property name="margin-bottom">24</property>
-                <property name="spacing">6</property>
+                <property name="hexpand">true</property>
+                <property name="vexpand">true</property>
                 <child>
-                  <object class="GtkImage">
-                    <property name="icon-name">go-up-symbolic</property>
-                    <property name="halign">center</property>
-                    <style>
-                      <class name="unity-lock-text"/>
-                    </style>
+                  <object class="UnityLockDatetime" id="datetime">
+                    <property name="scale">14</property>
+                    <property name="hexpand">true</property>
+                    <property name="vexpand">true</property>
+                    <property name="valign">center</property>
                   </object>
                 </child>
                 <child>
-                  <object class="GtkLabel">
-                    <property name="label" translatable="yes">Press any key to unlock</property>
+                  <object class="GtkBox">
+                    <property name="orientation">vertical</property>
                     <property name="halign">center</property>
-                    <style>
-                      <class name="unity-lock-text"/>
-                    </style>
+                    <property name="valign">end</property>
+                    <property name="margin-bottom">24</property>
+                    <property name="spacing">6</property>
+                    <child>
+                      <object class="GtkImage">
+                        <property name="icon-name">go-up-symbolic</property>
+                        <property name="halign">center</property>
+                        <style>
+                          <class name="unity-lock-text"/>
+                        </style>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="GtkLabel">
+                        <property name="label" translatable="yes">Press any key to unlock</property>
+                        <property name="halign">center</property>
+                        <style>
+                          <class name="unity-lock-text"/>
+                        </style>
+                      </object>
+                    </child>
                   </object>
                 </child>
               </object>
-            </child>
-          </object>
         </property>
       </object>
         </child>

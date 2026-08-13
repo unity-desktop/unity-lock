@@ -15,10 +15,10 @@
         <property name="allow-scroll-wheel">true</property>
         <property name="allow-long-swipes">true</property>
         <child>
-          <object class="UnityLockDatetimePage" id="datetime_page"/>
+          <object class="UnityLockDatetimePage"/>
         </child>
         <child>
-          <object class="UnityLockUserPage" id="user_page"/>
+          <object class="UnityLockUserPage"/>
         </child>
       </object>
     </property>

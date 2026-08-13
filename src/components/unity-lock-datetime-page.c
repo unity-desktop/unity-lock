@@ -28,8 +28,6 @@ struct _UnityLockDatetimePage
   AdwBin parent_instance;
 
   GtkPicture *wallpaper;
-
-  UnityLockDatetime *datetime;
 };
 
 G_DEFINE_FINAL_TYPE (UnityLockDatetimePage, unity_lock_datetime_page, ADW_TYPE_BIN)
@@ -44,7 +42,6 @@ unity_lock_datetime_page_class_init (UnityLockDatetimePageClass *klass)
   gtk_widget_class_set_template_from_resource (widget_class,
                                                "/org/unity/Lock/unity-lock-datetime-page.ui");
   gtk_widget_class_bind_template_child (widget_class, UnityLockDatetimePage, wallpaper);
-  gtk_widget_class_bind_template_child (widget_class, UnityLockDatetimePage, datetime);
 }
 
 static void
@@ -53,10 +50,4 @@ unity_lock_datetime_page_init (UnityLockDatetimePage *self)
   gtk_widget_init_template (GTK_WIDGET (self));
 
   gtk_picture_set_paintable (self->wallpaper, unity_lock_background_get ());
-}
-
-GtkWidget *
-unity_lock_datetime_page_new (void)
-{
-  return g_object_new (UNITY_LOCK_TYPE_DATETIME_PAGE, NULL);
 }

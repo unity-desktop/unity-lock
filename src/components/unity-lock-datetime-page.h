@@ -43,13 +43,4 @@ G_BEGIN_DECLS
 G_DECLARE_FINAL_TYPE (UnityLockDatetimePage, unity_lock_datetime_page,
                       UNITY_LOCK, DATETIME_PAGE, AdwBin)
 
-/**
- * unity_lock_datetime_page_new:
- *
- * Creates the clock page.
- *
- * Returns: (transfer full): a new #UnityLockDatetimePage.
- */
-GtkWidget *unity_lock_datetime_page_new (void);
-
 G_END_DECLS

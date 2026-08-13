@@ -1,0 +1,6 @@
+# Please keep this file sorted alphabetically.
+# List of source files containing translatable strings.
+src/components/unity-lock-datetime-page.ui
+src/components/unity-lock-user-page.c
+src/components/unity-lock-user-page.ui
+src/main.c

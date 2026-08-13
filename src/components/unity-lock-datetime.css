@@ -1,0 +1,134 @@
+/* Type layout for the clock block, then one rule set per clock face.
+ *
+ * Face classes are named after the org.unity.Lock style nick, which is also the
+ * font filename in data/fonts. UnityLockDatetime puts one of them on itself.
+ * The `default` style has no rule set and inherits the session font.
+ *
+ * Sizes here are always relative. The time takes its size from a scale
+ * attribute in unity-lock-datetime.ui and the date from libadwaita's .title-2,
+ * so the theme font size and text scaling both still apply.
+ */
+
+.unity-lock-time,
+.unity-lock-date {
+  line-height: 1;
+  margin: 0;
+  padding: 0;
+}
+
+.unity-lock-time {
+  letter-spacing: -0.02em;
+}
+
+.unity-lock-date {
+  line-height: 1.15;
+  letter-spacing: 0.01em;
+}
+
+/* Optical corrections.
+ *
+ * Pinning line-height above makes the label boxes identical for every face, but
+ * the eye reads ink, not boxes. How much of its em box a face fills varies a
+ * lot. Press Start 2P draws 67px of ink in a 77px box, Bagel Fat One draws 100px
+ * in 196px. Measured, the gap between date and time ran from 12px to 72px.
+ *
+ * Faces more than 7px off the 47px norm carry a margin on the time label to pull
+ * them back. Each records the gap it corrects. Values are in em so they track
+ * the font size of the label they apply to.
+ */
+
+.fraunces {
+  font-family: "Fraunces";
+  font-variation-settings: "wght" 300, "SOFT" 100, "WONK" 1, "opsz" 144;
+}
+
+.bitcount-prop-single {
+  font-family: "Bitcount Prop Single";
+  font-variation-settings: "wght" 400;
+}
+
+/* was 54px */
+.bitcount-prop-single .unity-lock-time {
+  margin-top: -0.48em;
+}
+
+.press-start-2p {
+  font-family: "Press Start 2P";
+  font-size: 0.52em;
+}
+
+/* was 12px, a bitmap face with almost no built in slack */
+.press-start-2p .unity-lock-time {
+  margin-top: 4.59em;
+}
+
+.sixtyfour {
+  font-family: "Sixtyfour";
+  font-variation-settings: "BLED" 0, "SCAN" 0;
+  font-size: 0.58em;
+}
+
+/* was 14px, same reason as Press Start 2P */
+.sixtyfour .unity-lock-time {
+  margin-top: 3.88em;
+}
+
+.audiowide {
+  font-family: "Audiowide";
+  font-size: 0.82em;
+}
+
+.michroma {
+  font-family: "Michroma";
+  font-size: 0.72em;
+}
+
+/* was 55px */
+.michroma .unity-lock-time {
+  margin-top: -0.76em;
+}
+
+.tourney {
+  font-family: "Tourney";
+  font-variation-settings: "wght" 500, "wdth" 90;
+}
+
+.bagel-fat-one {
+  font-family: "Bagel Fat One";
+  font-size: 0.92em;
+}
+
+/* was 72px, the face reserves a lot of room for accents */
+.bagel-fat-one .unity-lock-time {
+  margin-top: -1.85em;
+}
+
+.dynapuff {
+  font-family: "DynaPuff";
+  font-variation-settings: "wght" 500, "wdth" 100;
+  font-size: 0.95em;
+}
+
+.kablammo {
+  font-family: "Kablammo";
+  font-variation-settings: "MORF" 30;
+  font-size: 0.95em;
+}
+
+.rubik-glitch {
+  font-family: "Rubik Glitch";
+}
+
+.ewert {
+  font-family: "Ewert";
+}
+
+.limelight {
+  font-family: "Limelight";
+}
+
+.climate-crisis {
+  font-family: "Climate Crisis";
+  font-variation-settings: "YEAR" 1979;
+  font-size: 0.68em;
+}

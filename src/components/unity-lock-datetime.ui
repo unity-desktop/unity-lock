@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<interface>
+  <requires lib="gtk" version="4.0"/>
+  <requires lib="libadwaita" version="1.4"/>
+  <template class="UnityLockDatetime" parent="AdwBin">
+    <property name="child">
+      <object class="GtkBox">
+        <property name="orientation">vertical</property>
+        <property name="halign">center</property>
+        <property name="valign">center</property>
+        <property name="spacing">12</property>
+        <child>
+          <object class="GtkLabel" id="date_label">
+            <property name="justify">center</property>
+            <property name="wrap">true</property>
+            <property name="max-width-chars">28</property>
+            <style>
+              <class name="title-2"/>
+              <class name="body"/>
+              <class name="unity-lock-date"/>
+              <class name="unity-lock-text"/>
+            </style>
+          </object>
+        </child>
+        <child>
+          <object class="GtkLabel" id="time_label">
+            <property name="justify">center</property>
+            <style>
+              <class name="unity-lock-time"/>
+              <class name="unity-lock-text"/>
+            </style>
+            <attributes>
+              <attribute name="scale" value="10"/>
+            </attributes>
+          </object>
+        </child>
+      </object>
+    </property>
+  </template>
+</interface>

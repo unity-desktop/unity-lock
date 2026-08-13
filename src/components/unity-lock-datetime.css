@@ -4,19 +4,19 @@
  * font filename in data/fonts. UnityLockDatetime puts one of them on itself.
  * The `default` style has no rule set and inherits the session font.
  *
- * Sizes here are always relative. The time takes its size from a scale
- * attribute in unity-lock-datetime.ui and the date from libadwaita's .title-2,
- * so the theme font size and text scaling both still apply.
+ * Sizes here are always relative. The time takes its size from the scale
+ * property, which an #AdwBreakpoint drives, and the date from libadwaita's
+ * .title-2, so the theme font size and text scaling both still apply.
  */
 
 .unity-lock-time,
 .unity-lock-date {
-  line-height: 1;
   margin: 0;
   padding: 0;
 }
 
 .unity-lock-time {
+  line-height: 1;
   letter-spacing: -0.02em;
 }
 

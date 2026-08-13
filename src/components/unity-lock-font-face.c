@@ -1,4 +1,4 @@
-/* unity-lock-face.c
+/* unity-lock-font-face.c
  *
  * Copyright 2026 Muqtadir
  *
@@ -28,7 +28,8 @@
 typedef struct
 {
   const gchar *label;
-  const gchar *category;} FaceSpec;
+  const gchar *category;
+} FaceSpec;
 
 static const FaceSpec specs[] = {
   [UNITY_LOCK_FONT_FACE_STYLE_DEFAULT]              = { "Default", NULL },
@@ -78,15 +79,6 @@ struct _UnityLockFontFace
   gboolean        failed;
 };
 
-typedef enum {
-  PROP_STYLE = 1,
-  PROP_NICK,
-  PROP_LABEL,
-  PROP_CATEGORY,
-} UnityLockFontFaceProps;
-
-static GParamSpec *props[PROP_CATEGORY + 1];
-
 G_DEFINE_FINAL_TYPE (UnityLockFontFace, unity_lock_font_face, G_TYPE_OBJECT)
 
 UnityLockFontFaceStyle
@@ -122,81 +114,9 @@ unity_lock_font_face_get_category (UnityLockFontFace *self)
 }
 
 static void
-unity_lock_font_face_get_property (GObject    *object,
-                              guint       prop_id,
-                              GValue     *value,
-                              GParamSpec *pspec)
-{
-  UnityLockFontFace *self = UNITY_LOCK_FONT_FACE (object);
-
-  (void) pspec;
-
-  switch ((UnityLockFontFaceProps) prop_id)
-    {
-    case PROP_STYLE:
-      g_value_set_enum (value, unity_lock_font_face_get_style (self));
-      break;
-
-    case PROP_NICK:
-      g_value_set_string (value, self->nick);
-      break;
-
-    case PROP_LABEL:
-      g_value_set_string (value, self->spec->label);
-      break;
-
-    case PROP_CATEGORY:
-      g_value_set_string (value, self->spec->category);
-      break;
-    }
-}
-
-static void
 unity_lock_font_face_class_init (UnityLockFontFaceClass *klass)
 {
-  GObjectClass *object_class = G_OBJECT_CLASS (klass);
-
-  object_class->get_property = unity_lock_font_face_get_property;
-
-  /**
-   * UnityLockFontFace:style:
-   *
-   * The style this face implements.
-   */
-  props[PROP_STYLE] =
-    g_param_spec_enum ("style", NULL, NULL,
-                       UNITY_LOCK_TYPE_FONT_FACE_STYLE,
-                       UNITY_LOCK_FONT_FACE_STYLE_DEFAULT,
-                       G_PARAM_READABLE | G_PARAM_STATIC_STRINGS);
-
-  /**
-   * UnityLockFontFace:nick:
-   *
-   * The stable identifier, which is also the CSS class for this face.
-   */
-  props[PROP_NICK] =
-    g_param_spec_string ("nick", NULL, NULL, NULL,
-                         G_PARAM_READABLE | G_PARAM_STATIC_STRINGS);
-
-  /**
-   * UnityLockFontFace:label:
-   *
-   * The name to show in a settings UI.
-   */
-  props[PROP_LABEL] =
-    g_param_spec_string ("label", NULL, NULL, NULL,
-                         G_PARAM_READABLE | G_PARAM_STATIC_STRINGS);
-
-  /**
-   * UnityLockFontFace:category:
-   *
-   * The group this face belongs to in a settings UI.
-   */
-  props[PROP_CATEGORY] =
-    g_param_spec_string ("category", NULL, NULL, NULL,
-                         G_PARAM_READABLE | G_PARAM_STATIC_STRINGS);
-
-  g_object_class_install_properties (object_class, G_N_ELEMENTS (props), props);
+  (void) klass;
 }
 
 static void

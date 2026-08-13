@@ -22,7 +22,6 @@
 
 #include <adwaita.h>
 
-#include "unity-lock-font-face.h"
 
 G_BEGIN_DECLS
 
@@ -56,72 +55,5 @@ G_DECLARE_FINAL_TYPE (UnityLockDatetime, unity_lock_datetime, UNITY_LOCK, DATETI
  * Returns: (transfer full): a new #UnityLockDatetime.
  */
 GtkWidget *unity_lock_datetime_new (void);
-
-/**
- * unity_lock_datetime_get_style:
- * @self: a #UnityLockDatetime.
- *
- * Gets the clock face in use.
- *
- * Returns: a #UnityLockFontFaceStyle.
- */
-UnityLockFontFaceStyle unity_lock_datetime_get_style (UnityLockDatetime *self);
-
-/**
- * unity_lock_datetime_set_style:
- * @self: a #UnityLockDatetime.
- * @style: the face to draw in.
- *
- * Sets the clock face, overriding the org.unity.Lock style key until that key
- * next changes. An unknown @style falls back to the default face.
- */
-void unity_lock_datetime_set_style (UnityLockDatetime      *self,
-                                    UnityLockFontFaceStyle  style);
-
-/**
- * unity_lock_datetime_get_show_date:
- * @self: a #UnityLockDatetime.
- *
- * Gets whether the date is shown.
- *
- * Returns: %TRUE when the date is visible.
- */
-/**
- * unity_lock_datetime_get_scale:
- * @self: a #UnityLockDatetime.
- *
- * Gets how much the time is scaled above the theme font size.
- *
- * Returns: the scale factor.
- */
-gdouble unity_lock_datetime_get_scale (UnityLockDatetime *self);
-
-/**
- * unity_lock_datetime_set_scale:
- * @self: a #UnityLockDatetime.
- * @scale: factor to multiply the theme font size by.
- *
- * Sets how large the time is drawn, as a multiple of the theme font size. The
- * date is unaffected and keeps its own style class.
- *
- * This exists so an #AdwBreakpoint can drive it. Faces differ enough in advance
- * width that a fixed size overflows a narrow surface, so the scale has to follow
- * the width available.
- */
-void unity_lock_datetime_set_scale (UnityLockDatetime *self,
-                                    gdouble            scale);
-
-gboolean unity_lock_datetime_get_show_date (UnityLockDatetime *self);
-
-/**
- * unity_lock_datetime_set_show_date:
- * @self: a #UnityLockDatetime.
- * @show_date: %TRUE to show the date.
- *
- * Shows or hides the date beneath the time, overriding the org.unity.Lock
- * show-date key until that key next changes.
- */
-void unity_lock_datetime_set_show_date (UnityLockDatetime *self,
-                                        gboolean           show_date);
 
 G_END_DECLS

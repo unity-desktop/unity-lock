@@ -1,0 +1,7 @@
+#%PAM-1.0
+# PAM service for unity-lock: verify the current user's password to unlock.
+# Delegates entirely to the system auth stack.
+auth        include     system-auth
+account     include     system-auth
+password    include     system-auth
+session     include     system-auth

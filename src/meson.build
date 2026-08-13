@@ -30,7 +30,6 @@ unity_lock_resources = gnome.compile_resources(
   'unity-lock.gresource.xml',
   c_name: 'unity_lock',
   source_dir: ['.', meson.project_source_root() / 'data'],
-  dependencies: font_files,
 )
 
 unity_lock_link_args = [

@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<schemalist>
+  <enum id="org.unity.Lock.FontFace">
+    <value nick="default" value="0"/>
+    <value nick="fraunces" value="1"/>
+    <value nick="bitcount-prop-single" value="2"/>
+    <value nick="press-start-2p" value="3"/>
+    <value nick="sixtyfour" value="4"/>
+    <value nick="audiowide" value="5"/>
+    <value nick="michroma" value="6"/>
+    <value nick="tourney" value="7"/>
+    <value nick="bagel-fat-one" value="8"/>
+    <value nick="dynapuff" value="9"/>
+    <value nick="kablammo" value="10"/>
+    <value nick="rubik-glitch" value="11"/>
+    <value nick="ewert" value="12"/>
+    <value nick="limelight" value="13"/>
+    <value nick="climate-crisis" value="14"/>
+  </enum>
+
+  <schema id="org.unity.Lock" path="/org/unity/Lock/">
+    <key name="style" enum="org.unity.Lock.FontFace">
+      <default>'default'</default>
+      <summary>Clock face style</summary>
+      <description>
+        The font for the clock and the date. The value `default` uses the font
+        from org.gnome.desktop.interface. Each other value names a font that
+        unity-lock supplies. The lock screen applies a change immediately.
+      </description>
+    </key>
+
+    <key name="show-date" type="b">
+      <default>true</default>
+      <summary>Show the date under the clock</summary>
+      <description>
+        Shows the weekday, the month and the day below the time. The wide fonts
+        make the date line look crowded.
+      </description>
+    </key>
+  </schema>
+</schemalist>

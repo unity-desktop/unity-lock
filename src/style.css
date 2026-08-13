@@ -11,6 +11,15 @@ row.body .title {
   color: var(--light-1);
 }
 
+@keyframes unity-lock-hint-bob {
+  from { transform: translateY(9px); }
+  to { transform: translateY(-9px); }
+}
+
+.unity-lock-hint {
+  animation: unity-lock-hint-bob 1.6s ease-in-out infinite alternate;
+}
+
 .unity-lock-prompt {
   --accent-bg-color: var(--light-1);
   --accent-fg-color: var(--dark-5);

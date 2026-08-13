@@ -33,15 +33,15 @@ static gboolean                have_primary;
 static void
 on_monitor (GtkSessionLockInstance *instance, GdkMonitor *monitor, gpointer user_data)
 {
-    gboolean primary = !have_primary;
+  gboolean primary = !have_primary;
   have_primary = TRUE;
 
   GtkWindow *lock = unity_lock_new (GTK_APPLICATION (user_data), primary);
 
-    g_signal_connect_swapped (lock, "unlocked",
+  g_signal_connect_swapped (lock, "unlocked",
                             G_CALLBACK (gtk_session_lock_instance_unlock), instance);
 
-    gtk_session_lock_instance_assign_window_to_monitor (instance, lock, monitor);
+  gtk_session_lock_instance_assign_window_to_monitor (instance, lock, monitor);
 }
 
 static void
@@ -56,7 +56,7 @@ static void
 on_unlocked (GtkSessionLockInstance *instance, gpointer user_data)
 {
   (void) instance;
-    g_application_release (G_APPLICATION (user_data));
+  g_application_release (G_APPLICATION (user_data));
 }
 
 static void
@@ -64,7 +64,7 @@ on_activate (GApplication *app, gpointer user_data)
 {
   (void) user_data;
 
-    if (lock_instance != NULL)
+  if (lock_instance != NULL)
     return;
 
   if (!gtk_session_lock_is_supported ())
@@ -78,7 +78,7 @@ on_activate (GApplication *app, gpointer user_data)
   g_signal_connect (lock_instance, "failed", G_CALLBACK (on_failed), app);
   g_signal_connect (lock_instance, "unlocked", G_CALLBACK (on_unlocked), app);
 
-    g_application_hold (app);
+  g_application_hold (app);
   gtk_session_lock_instance_lock (lock_instance);
 }
 

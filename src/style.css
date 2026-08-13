@@ -22,3 +22,16 @@ row.body .title {
   color: #ffffff;
   font-weight: normal;
 }
+
+.unity-lock-back {
+  background-color: rgb(255 255 255 / 22%);
+  color: #ffffff;
+}
+
+.unity-lock-back:hover {
+  background-color: rgb(255 255 255 / 30%);
+}
+
+.unity-lock-back:active {
+  background-color: rgb(255 255 255 / 38%);
+}

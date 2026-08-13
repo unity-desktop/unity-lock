@@ -43,24 +43,6 @@ G_DECLARE_FINAL_TYPE (UnityLockUserPage, unity_lock_user_page,
                       UNITY_LOCK, USER_PAGE, AdwBin)
 
 /**
- * unity_lock_user_page_new:
- *
- * Creates the password prompt.
- *
- * Returns: (transfer full): a new #UnityLockUserPage.
- */
-GtkWidget *unity_lock_user_page_new (void);
-
-/**
- * unity_lock_user_page_focus_entry:
- * @self: a #UnityLockUserPage.
- *
- * Moves the keyboard focus to the password field. Call this once the page is on
- * screen, since the field is not mapped before then.
- */
-void unity_lock_user_page_focus_entry (UnityLockUserPage *self);
-
-/**
  * unity_lock_user_page_type_into_entry:
  * @self: a #UnityLockUserPage.
  * @text: characters to append.
@@ -73,12 +55,15 @@ void unity_lock_user_page_type_into_entry (UnityLockUserPage *self,
                                            const gchar       *text);
 
 /**
- * unity_lock_user_page_reset:
+ * unity_lock_user_page_set_active:
  * @self: a #UnityLockUserPage.
+ * @active: %TRUE once the page is the one on screen.
  *
- * Clears the field, drops any message and abandons the PAM conversation. Call
- * this when the user leaves the page.
+ * Tells the page whether it is the page the user is looking at. An active page
+ * takes the keyboard focus. An inactive one clears the field, drops any message,
+ * abandons the PAM conversation and gives up the focus.
  */
-void unity_lock_user_page_reset (UnityLockUserPage *self);
+void unity_lock_user_page_set_active (UnityLockUserPage *self,
+                                      gboolean           active);
 
 G_END_DECLS

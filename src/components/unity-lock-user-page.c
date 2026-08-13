@@ -39,7 +39,6 @@ struct _UnityLockUserPage
   GtkLabel            *message;
   AdwPasswordEntryRow *password;
   AdwPreferencesGroup *unlock_group;
-  AdwButtonRow        *unlock_button;
 
   ActUser               *user;
   UnityLockConversation *conversation;
@@ -160,17 +159,8 @@ submit (UnityLockUserPage *self)
 }
 
 static void
-on_password_activate (AdwEntryRow *row,
-                      gpointer     user_data)
-{
-  (void) row;
-
-  submit (UNITY_LOCK_USER_PAGE (user_data));
-}
-
-static void
-on_unlock_clicked (AdwButtonRow *row,
-                   gpointer      user_data)
+on_submit (GtkWidget *row,
+           gpointer   user_data)
 {
   (void) row;
 
@@ -214,14 +204,6 @@ update_user (UnityLockUserPage *self)
 }
 
 void
-unity_lock_user_page_focus_entry (UnityLockUserPage *self)
-{
-  g_return_if_fail (UNITY_LOCK_IS_USER_PAGE (self));
-
-  gtk_widget_grab_focus (GTK_WIDGET (self->password));
-}
-
-void
 unity_lock_user_page_type_into_entry (UnityLockUserPage *self,
                                       const gchar       *text)
 {
@@ -237,13 +219,35 @@ unity_lock_user_page_type_into_entry (UnityLockUserPage *self,
 }
 
 void
-unity_lock_user_page_reset (UnityLockUserPage *self)
+unity_lock_user_page_set_active (UnityLockUserPage *self,
+                                 gboolean           active)
 {
+  GtkRoot *root;
+
   g_return_if_fail (UNITY_LOCK_IS_USER_PAGE (self));
+
+  if (active)
+    {
+      gtk_widget_grab_focus (GTK_WIDGET (self));
+      return;
+    }
 
   unity_lock_conversation_cancel (self->conversation);
   clear_message (self);
   reset_entry (self);
+
+  root = gtk_widget_get_root (GTK_WIDGET (self));
+
+  if (root != NULL)
+    gtk_root_set_focus (root, NULL);
+}
+
+static gboolean
+unity_lock_user_page_grab_focus (GtkWidget *widget)
+{
+  UnityLockUserPage *self = UNITY_LOCK_USER_PAGE (widget);
+
+  return gtk_widget_grab_focus (GTK_WIDGET (self->password));
 }
 
 static void
@@ -299,6 +303,8 @@ unity_lock_user_page_class_init (UnityLockUserPageClass *klass)
   object_class->constructed = unity_lock_user_page_constructed;
   object_class->dispose = unity_lock_user_page_dispose;
 
+  widget_class->grab_focus = unity_lock_user_page_grab_focus;
+
   /**
    * UnityLockUserPage::unlocked:
    * @self: a #UnityLockUserPage.
@@ -319,9 +325,7 @@ unity_lock_user_page_class_init (UnityLockUserPageClass *klass)
   gtk_widget_class_bind_template_child (widget_class, UnityLockUserPage, message);
   gtk_widget_class_bind_template_child (widget_class, UnityLockUserPage, password);
   gtk_widget_class_bind_template_child (widget_class, UnityLockUserPage, unlock_group);
-  gtk_widget_class_bind_template_child (widget_class, UnityLockUserPage, unlock_button);
-  gtk_widget_class_bind_template_callback (widget_class, on_password_activate);
-  gtk_widget_class_bind_template_callback (widget_class, on_unlock_clicked);
+  gtk_widget_class_bind_template_callback (widget_class, on_submit);
 }
 
 static void
@@ -330,10 +334,4 @@ unity_lock_user_page_init (UnityLockUserPage *self)
   gtk_widget_init_template (GTK_WIDGET (self));
 
   gtk_picture_set_paintable (self->wallpaper, unity_lock_background_get ());
-}
-
-GtkWidget *
-unity_lock_user_page_new (void)
-{
-  return g_object_new (UNITY_LOCK_TYPE_USER_PAGE, NULL);
 }

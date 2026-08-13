@@ -29,9 +29,6 @@
               <class name="unity-lock-time"/>
               <class name="unity-lock-text"/>
             </style>
-            <attributes>
-              <attribute name="scale" value="10"/>
-            </attributes>
           </object>
         </child>
       </object>

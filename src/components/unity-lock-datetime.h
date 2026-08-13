@@ -86,6 +86,31 @@ void unity_lock_datetime_set_style (UnityLockDatetime      *self,
  *
  * Returns: %TRUE when the date is visible.
  */
+/**
+ * unity_lock_datetime_get_scale:
+ * @self: a #UnityLockDatetime.
+ *
+ * Gets how much the time is scaled above the theme font size.
+ *
+ * Returns: the scale factor.
+ */
+gdouble unity_lock_datetime_get_scale (UnityLockDatetime *self);
+
+/**
+ * unity_lock_datetime_set_scale:
+ * @self: a #UnityLockDatetime.
+ * @scale: factor to multiply the theme font size by.
+ *
+ * Sets how large the time is drawn, as a multiple of the theme font size. The
+ * date is unaffected and keeps its own style class.
+ *
+ * This exists so an #AdwBreakpoint can drive it. Sizing the clock by width is
+ * the only way to keep it from overflowing a narrow surface, and the widest
+ * bundled face draws the 12 hour string at 72px per unit of scale.
+ */
+void unity_lock_datetime_set_scale (UnityLockDatetime *self,
+                                    gdouble            scale);
+
 gboolean unity_lock_datetime_get_show_date (UnityLockDatetime *self);
 
 /**

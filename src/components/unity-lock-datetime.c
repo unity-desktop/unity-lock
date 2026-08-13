@@ -35,6 +35,7 @@ struct _UnityLockDatetime
 
   UnityLockFontFaceStyle style;
   gboolean               show_date;
+  gdouble                scale;
 
   GnomeWallClock *clock;
   GSettings      *interface;
@@ -45,6 +46,7 @@ enum {
   PROP_0,
   PROP_STYLE,
   PROP_SHOW_DATE,
+  PROP_SCALE,
   N_PROPS,
 };
 
@@ -93,6 +95,15 @@ apply_style (UnityLockDatetime *self)
   gtk_widget_set_font_map (GTK_WIDGET (self->date_label),
                            unity_lock_font_face_get_font_map ());
   gtk_widget_add_css_class (GTK_WIDGET (self), unity_lock_font_face_get_nick (face));
+}
+
+static void
+apply_scale (UnityLockDatetime *self)
+{
+  g_autoptr (PangoAttrList) attrs = pango_attr_list_new ();
+
+  pango_attr_list_insert (attrs, pango_attr_scale_new (self->scale));
+  gtk_label_set_attributes (self->time_label, attrs);
 }
 
 static void
@@ -150,6 +161,30 @@ unity_lock_datetime_set_style (UnityLockDatetime      *self,
   g_object_notify_by_pspec (G_OBJECT (self), props[PROP_STYLE]);
 }
 
+gdouble
+unity_lock_datetime_get_scale (UnityLockDatetime *self)
+{
+  g_return_val_if_fail (UNITY_LOCK_IS_DATETIME (self), 1.0);
+
+  return self->scale;
+}
+
+void
+unity_lock_datetime_set_scale (UnityLockDatetime *self,
+                               gdouble            scale)
+{
+  g_return_if_fail (UNITY_LOCK_IS_DATETIME (self));
+  g_return_if_fail (scale > 0.0);
+
+  if (self->scale == scale)
+    return;
+
+  self->scale = scale;
+  apply_scale (self);
+
+  g_object_notify_by_pspec (G_OBJECT (self), props[PROP_SCALE]);
+}
+
 gboolean
 unity_lock_datetime_get_show_date (UnityLockDatetime *self)
 {
@@ -193,6 +228,10 @@ unity_lock_datetime_get_property (GObject    *object,
       g_value_set_boolean (value, self->show_date);
       break;
 
+    case PROP_SCALE:
+      g_value_set_double (value, self->scale);
+      break;
+
     default:
       G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
     }
@@ -214,6 +253,10 @@ unity_lock_datetime_set_property (GObject      *object,
 
     case PROP_SHOW_DATE:
       unity_lock_datetime_set_show_date (self, g_value_get_boolean (value));
+      break;
+
+    case PROP_SCALE:
+      unity_lock_datetime_set_scale (self, g_value_get_double (value));
       break;
 
     default:
@@ -264,6 +307,7 @@ unity_lock_datetime_constructed (GObject *object)
   ensure_stylesheet (GTK_WIDGET (self));
   gtk_widget_set_visible (GTK_WIDGET (self->date_label), self->show_date);
   apply_style (self);
+  apply_scale (self);
   update_time (self);
 }
 
@@ -312,6 +356,17 @@ unity_lock_datetime_class_init (UnityLockDatetimeClass *klass)
     g_param_spec_boolean ("show-date", NULL, NULL, TRUE,
                           G_PARAM_READWRITE | G_PARAM_EXPLICIT_NOTIFY | G_PARAM_STATIC_STRINGS);
 
+  /**
+   * UnityLockDatetime:scale:
+   *
+   * How much larger than the theme font the time is drawn. Meant to be driven by
+   * an #AdwBreakpoint so the clock never overflows a narrow surface.
+   */
+  props[PROP_SCALE] =
+    g_param_spec_double ("scale", NULL, NULL,
+                         0.1, 100.0, 14.0,
+                         G_PARAM_READWRITE | G_PARAM_EXPLICIT_NOTIFY | G_PARAM_STATIC_STRINGS);
+
   g_object_class_install_properties (object_class, N_PROPS, props);
 
   gtk_widget_class_set_template_from_resource (widget_class,
@@ -324,6 +379,7 @@ static void
 unity_lock_datetime_init (UnityLockDatetime *self)
 {
   self->show_date = TRUE;
+  self->scale = 14.0;
 
   gtk_widget_init_template (GTK_WIDGET (self));
 }

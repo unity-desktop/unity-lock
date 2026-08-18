@@ -11,7 +11,7 @@ unity_lock_deps = [
   dep_layershell,
 ]
 
-unity_lock_defs = configure_file(
+configure_file(
   input:         'unity-lock-defs.h.in',
   output:        'unity-lock-defs.h',
   configuration: mirror_conf,
@@ -42,10 +42,8 @@ executable(
   'unity-lock',
   unity_lock_sources,
   unity_lock_resources,
-  unity_lock_defs,
   dependencies:        unity_lock_deps,
   include_directories: include_directories('.', 'auth', 'components'),
   link_args:           unity_lock_link_args,
   install:             true,
-  install_dir:         bindir,
 )

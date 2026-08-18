@@ -6,7 +6,7 @@ lock screen for unity-desktop, that locks the running session with the
 
 ### screenshots
 
-the clock face comes from the `style` key in `org.unity.Lock`. every face below
+the clock face comes from the `style` key in `org.unity.lock`. every face below
 is bundled in the program, so none of them need a font installed on the host.
 `default` is the session interface font, the rest link to their Google Fonts page.
 

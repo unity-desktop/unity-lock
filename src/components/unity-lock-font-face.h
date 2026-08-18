@@ -46,8 +46,8 @@ G_BEGIN_DECLS
  * %UNITY_LOCK_FONT_FACE_STYLE_DEFAULT names a font bundled in the gresource, so no
  * style depends on a font being installed on the host.
  *
- * These numbers are the stored form of the org.unity.Lock style key and must
- * match the nicks in data/org.unity.Lock.gschema.xml. Append only.
+ * These numbers are the stored form of the org.unity.lock style key and must
+ * match the nicks in data/org.unity.lock.gschema.xml. Append only.
  */
 typedef enum
 {

@@ -10,17 +10,15 @@ project(
   ],
 )
 
-dep_gtk       = dependency('gtk4',            version: '>= 4.22')
-dep_adw       = dependency('libadwaita-1',    version: '>= 1.9')
-dep_gio       = dependency('gio-2.0',         version: '>= 2.76')
-dep_glib      = dependency('glib-2.0',        version: '>= 2.76')
-dep_act       = dependency('accountsservice', version: '>= 23.13.9')
-dep_astalauth = dependency('astal-auth-0.1')
-dep_gnomedt   = dependency('gnome-desktop-4')
-
-dep_pango      = dependency('pango', version: '>= 1.56')
+dep_gtk        = dependency('gtk4',            version: '>= 4.22')
+dep_adw        = dependency('libadwaita-1',    version: '>= 1.9')
+dep_gio        = dependency('gio-2.0',         version: '>= 2.76')
+dep_glib       = dependency('glib-2.0',        version: '>= 2.76')
+dep_act        = dependency('accountsservice', version: '>= 23.13.9')
+dep_gnomedt    = dependency('gnome-desktop-4')
+dep_pango      = dependency('pango',           version: '>= 1.56')
 dep_pangocairo = dependency('pangocairo')
-
+dep_astalauth  = dependency('astal-auth-0.1')
 dep_layershell = dependency('gtk4-layer-shell-0', version: '>= 1.0')
 
 dependency('gsettings-desktop-schemas')
@@ -28,13 +26,7 @@ dependency('gsettings-desktop-schemas')
 gnome = import('gnome')
 i18n  = import('i18n')
 
-prefix    = get_option('prefix')
-bindir    = prefix / get_option('bindir')
-datadir   = prefix / get_option('datadir')
-localedir = prefix / get_option('localedir')
-
 gettext_package = meson.project_name()
-podir           = meson.project_source_root() / 'po'
 
 mirror_root = '/var/lib/unity-greeter'
 
@@ -44,7 +36,7 @@ mirror_conf.set('mirror_root', mirror_root)
 add_project_arguments(
   '-DGNOME_DESKTOP_USE_UNSTABLE_API',
   '-DGETTEXT_PACKAGE="' + gettext_package + '"',
-  '-DUNITY_LOCK_LOCALEDIR="' + localedir + '"',
+  '-DUNITY_LOCK_LOCALEDIR="' + get_option('prefix') / get_option('localedir') + '"',
   '-DUNITY_LOCK_VERSION="' + meson.project_version() + '"',
   language: 'c',
 )

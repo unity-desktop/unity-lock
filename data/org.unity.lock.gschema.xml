@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <schemalist>
-  <enum id="org.unity.Lock.FontFace">
+  <enum id="org.unity.lock.FontFace">
     <value nick="default" value="0"/>
     <value nick="fraunces" value="1"/>
     <value nick="bitcount-prop-single" value="2"/>
@@ -19,23 +19,21 @@
     <value nick="climate-crisis" value="14"/>
   </enum>
 
-  <schema id="org.unity.Lock" path="/org/unity/Lock/">
-    <key name="style" enum="org.unity.Lock.FontFace">
+  <schema id="org.unity.lock" path="/org/unity/lock/">
+    <key name="style" enum="org.unity.lock.FontFace">
       <default>'default'</default>
       <summary>Clock face style</summary>
       <description>
-        The font for the clock and the date. The value `default` uses the font
-        from org.gnome.desktop.interface. Each other value names a font that
-        unity-lock supplies. The lock screen applies a change immediately.
+        The font for the clock and the date. `default` uses the system font. The
+        other values are fonts that come with the lock screen.
       </description>
     </key>
 
     <key name="show-date" type="b">
       <default>true</default>
-      <summary>Show the date under the clock</summary>
+      <summary>Show the date</summary>
       <description>
-        Shows the weekday, the month and the day below the time. The wide fonts
-        make the date line look crowded.
+        Shows the weekday, the month and the day.
       </description>
     </key>
   </schema>

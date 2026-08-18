@@ -37,7 +37,7 @@ G_BEGIN_DECLS
  *
  * The time and date shown on the lock screen.
  *
- * Instances follow the org.unity.Lock style and show-date keys, so changing a key
+ * Instances follow the org.unity.lock style and show-date keys, so changing a key
  * updates every instance, including one already on screen. Setting the matching
  * property overrides the key until it next changes.
  *

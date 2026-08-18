@@ -16,6 +16,7 @@
 }
 
 .unity-lock-time {
+  font-feature-settings: "tnum" 1;
   line-height: 1;
   letter-spacing: -0.02em;
 }

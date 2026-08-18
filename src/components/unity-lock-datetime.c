@@ -25,7 +25,7 @@
 #include "unity-lock-font-face.h"
 
 #define STYLESHEET       "/org/unity/Lock/unity-lock-datetime.css"
-#define LOCK_SCHEMA      "org.unity.Lock"
+#define LOCK_SCHEMA      "org.unity.lock"
 #define INTERFACE_SCHEMA "org.gnome.desktop.interface"
 
 struct _UnityLockDatetime
@@ -261,7 +261,7 @@ unity_lock_datetime_class_init (UnityLockDatetimeClass *klass)
    */
   props[PROP_SCALE] =
     g_param_spec_double ("scale", NULL, NULL,
-                         0.1, 100.0, 14.0,
+                         0.1, 10.0, 10.0,
                          G_PARAM_READWRITE | G_PARAM_EXPLICIT_NOTIFY | G_PARAM_STATIC_STRINGS);
 
   g_object_class_install_properties (object_class, G_N_ELEMENTS (props), props);
@@ -275,7 +275,7 @@ unity_lock_datetime_class_init (UnityLockDatetimeClass *klass)
 static void
 unity_lock_datetime_init (UnityLockDatetime *self)
 {
-  self->scale = 14.0;
+  self->scale = 10.0;
 
   gtk_widget_init_template (GTK_WIDGET (self));
 }

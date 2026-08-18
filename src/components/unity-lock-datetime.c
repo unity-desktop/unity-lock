@@ -24,7 +24,6 @@
 
 #include "unity-lock-font-face.h"
 
-#define STYLESHEET       "/org/unity/Lock/unity-lock-datetime.css"
 #define LOCK_SCHEMA      "org.unity.lock"
 #define INTERFACE_SCHEMA "org.gnome.desktop.interface"
 
@@ -36,6 +35,7 @@ struct _UnityLockDatetime
   GtkLabel *date_label;
 
   UnityLockFontFaceStyle style;
+  UnityLockFontFaceStyle applied_style;
   gdouble                scale;
 
   GnomeWallClock *clock;
@@ -52,46 +52,32 @@ static GParamSpec *props[PROP_SCALE + 1];
 G_DEFINE_FINAL_TYPE (UnityLockDatetime, unity_lock_datetime, ADW_TYPE_BIN)
 
 static void
-ensure_stylesheet (GtkWidget *widget)
-{
-  static gsize loaded = 0;
-  GdkDisplay *display = gtk_widget_get_display (widget);
-
-  if (display == NULL || !g_once_init_enter (&loaded))
-    return;
-
-  g_autoptr (GtkCssProvider) provider = gtk_css_provider_new ();
-
-  gtk_css_provider_load_from_resource (provider, STYLESHEET);
-  gtk_style_context_add_provider_for_display (display,
-                                              GTK_STYLE_PROVIDER (provider),
-                                              GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);
-
-  g_once_init_leave (&loaded, 1);
-}
-
-static void
 apply_style (UnityLockDatetime *self)
 {
-  UnityLockFontFace *face = unity_lock_font_face_for_style (self->style);
-  GListModel *all = unity_lock_font_face_get_all ();
+  PangoFontMap *map = NULL;
 
-  for (guint i = 0; i < g_list_model_get_n_items (all); i++)
+  /* The default style carries no class of its own, so it doubles as the "nothing
+     applied" state and the field needs no separate sentinel. */
+  if (self->applied_style != UNITY_LOCK_FONT_FACE_STYLE_DEFAULT)
+    gtk_widget_remove_css_class (GTK_WIDGET (self),
+                                 unity_lock_font_face_nick (self->applied_style));
+
+  self->applied_style = UNITY_LOCK_FONT_FACE_STYLE_DEFAULT;
+
+  if (unity_lock_font_face_load (self->style))
     {
-      g_autoptr (UnityLockFontFace) other = g_list_model_get_item (all, i);
-
-      gtk_widget_remove_css_class (GTK_WIDGET (self),
-                                   unity_lock_font_face_get_nick (other));
+      self->applied_style = self->style;
+      map = unity_lock_font_face_get_font_map ();
     }
 
-  if (!unity_lock_font_face_load (face))
-    return;
+  /* A NULL map restores the default one, so leaving a bundled face does not
+     leave its map behind on the labels. */
+  gtk_widget_set_font_map (GTK_WIDGET (self->time_label), map);
+  gtk_widget_set_font_map (GTK_WIDGET (self->date_label), map);
 
-  gtk_widget_set_font_map (GTK_WIDGET (self->time_label),
-                           unity_lock_font_face_get_font_map ());
-  gtk_widget_set_font_map (GTK_WIDGET (self->date_label),
-                           unity_lock_font_face_get_font_map ());
-  gtk_widget_add_css_class (GTK_WIDGET (self), unity_lock_font_face_get_nick (face));
+  if (self->applied_style != UNITY_LOCK_FONT_FACE_STYLE_DEFAULT)
+    gtk_widget_add_css_class (GTK_WIDGET (self),
+                              unity_lock_font_face_nick (self->applied_style));
 }
 
 static void
@@ -224,7 +210,6 @@ unity_lock_datetime_constructed (GObject *object)
   g_signal_connect_object (self->clock, "notify::clock",
                            G_CALLBACK (update_time), self, G_CONNECT_SWAPPED);
 
-  ensure_stylesheet (GTK_WIDGET (self));
   apply_style (self);
   apply_scale (self);
   update_time (self);
@@ -278,10 +263,4 @@ unity_lock_datetime_init (UnityLockDatetime *self)
   self->scale = 10.0;
 
   gtk_widget_init_template (GTK_WIDGET (self));
-}
-
-GtkWidget *
-unity_lock_datetime_new (void)
-{
-  return g_object_new (UNITY_LOCK_TYPE_DATETIME, NULL);
 }

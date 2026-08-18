@@ -65,13 +65,12 @@ set_busy (UnityLockConversation *self,
 
 static void
 report_prompt (UnityLockConversation *self,
-               const gchar           *message,
-               gboolean               visible)
+               const gchar           *message)
 {
   self->awaiting = TRUE;
   set_busy (self, FALSE);
 
-  g_signal_emit (self, signals[SIGNAL_PROMPT], 0, message, visible);
+  g_signal_emit (self, signals[SIGNAL_PROMPT], 0, message);
 }
 
 static void
@@ -89,7 +88,7 @@ on_prompt_hidden (AstalAuthPam *pam,
       return;
     }
 
-  report_prompt (self, message, FALSE);
+  report_prompt (self, message);
 }
 
 static void
@@ -103,7 +102,7 @@ on_prompt_visible (AstalAuthPam *pam,
 
   g_clear_pointer (&self->secret, g_free);
 
-  report_prompt (self, message, TRUE);
+  report_prompt (self, message);
 }
 
 static void
@@ -248,15 +247,13 @@ unity_lock_conversation_class_init (UnityLockConversationClass *klass)
    * UnityLockConversation::prompt:
    * @self: a #UnityLockConversation.
    * @message: text PAM wants shown against the input.
-   * @visible: %TRUE when the answer should not be masked.
    *
    * PAM is waiting for an answer. Reply with
    * unity_lock_conversation_submit().
    */
   signals[SIGNAL_PROMPT] =
     g_signal_new ("prompt", G_TYPE_FROM_CLASS (klass), G_SIGNAL_RUN_LAST,
-                  0, NULL, NULL, NULL, G_TYPE_NONE, 2,
-                  G_TYPE_STRING, G_TYPE_BOOLEAN);
+                  0, NULL, NULL, NULL, G_TYPE_NONE, 1, G_TYPE_STRING);
 
   /**
    * UnityLockConversation::message:

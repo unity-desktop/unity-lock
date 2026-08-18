@@ -47,13 +47,4 @@ G_BEGIN_DECLS
  */
 G_DECLARE_FINAL_TYPE (UnityLockDatetime, unity_lock_datetime, UNITY_LOCK, DATETIME, AdwBin)
 
-/**
- * unity_lock_datetime_new:
- *
- * Creates the lock screen time and date.
- *
- * Returns: (transfer full): a new #UnityLockDatetime.
- */
-GtkWidget *unity_lock_datetime_new (void);
-
 G_END_DECLS

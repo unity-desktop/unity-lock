@@ -1,3 +1,5 @@
+@import url("resource:///org/unity/Lock/unity-lock-datetime.css");
+
 /* Floor under the pages, so a surface with no published wallpaper stays dark. */
 .unity-lock {
   background-color: var(--dark-4);
@@ -33,14 +35,14 @@ row.body .title {
 }
 
 .unity-lock-back {
-  background-color: alpha(var(--light-1), 0.22);
+  background-color: alpha(currentcolor, 0.22);
   color: var(--light-1);
 }
 
 .unity-lock-back:hover {
-  background-color: alpha(var(--light-1), 0.30);
+  background-color: alpha(currentcolor, 0.30);
 }
 
 .unity-lock-back:active {
-  background-color: alpha(var(--light-1), 0.38);
+  background-color: alpha(currentcolor, 0.38);
 }

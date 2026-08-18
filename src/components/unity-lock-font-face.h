@@ -78,103 +78,36 @@ typedef enum
 GType unity_lock_font_face_style_get_type (void);
 
 /**
- * UNITY_LOCK_TYPE_FONT_FACE:
- *
- * The #GType for #UnityLockFontFace.
- */
-#define UNITY_LOCK_TYPE_FONT_FACE (unity_lock_font_face_get_type ())
-
-/**
- * UnityLockFontFace:
- *
- * One clock face. The set is fixed at build time, so instances are read only.
- *
- * A face is identified by its nick, which is the schema enum nick, the font
- * filename in data/fonts and the CSS class that styles it. Everything
- * typographic lives in unity-lock-datetime.css rather than here.
- */
-G_DECLARE_FINAL_TYPE (UnityLockFontFace, unity_lock_font_face, UNITY_LOCK, FONT_FACE, GObject)
-
-/**
- * unity_lock_font_face_get_all:
- *
- * Gets every face, in #UnityLockFontFaceStyle order. Suitable as the model for a
- * settings drop down.
- *
- * Returns: (transfer none): a #GListModel of #UnityLockFontFace.
- */
-GListModel *unity_lock_font_face_get_all (void);
-
-/**
- * unity_lock_font_face_for_style:
+ * unity_lock_font_face_nick:
  * @style: a #UnityLockFontFaceStyle.
  *
- * Looks up the face for @style, falling back to the default face when @style is
- * out of range.
+ * Gets the nick for @style. The nick is the schema enum nick, the font filename
+ * in data/fonts and the CSS class that styles the face.
  *
- * Returns: (transfer none): the matching #UnityLockFontFace.
+ * Returns: (nullable): the nick, owned by the enum class, or %NULL for a value
+ *   outside the enum.
  */
-UnityLockFontFace *unity_lock_font_face_for_style (UnityLockFontFaceStyle style);
-
-/**
- * unity_lock_font_face_get_style:
- * @self: a #UnityLockFontFace.
- *
- * Gets the style this face implements.
- *
- * Returns: a #UnityLockFontFaceStyle.
- */
-UnityLockFontFaceStyle unity_lock_font_face_get_style (UnityLockFontFace *self);
-
-/**
- * unity_lock_font_face_get_nick:
- * @self: a #UnityLockFontFace.
- *
- * Gets the stable identifier for this face. It doubles as the CSS class that
- * styles the face, so it can be passed to gtk_widget_add_css_class().
- *
- * Returns: (transfer none): the nick.
- */
-const gchar *unity_lock_font_face_get_nick (UnityLockFontFace *self);
-
-/**
- * unity_lock_font_face_get_label:
- * @self: a #UnityLockFontFace.
- *
- * Gets the name to show in a settings UI. Typeface names are not translated.
- *
- * Returns: (transfer none): the display name.
- */
-const gchar *unity_lock_font_face_get_label (UnityLockFontFace *self);
-
-/**
- * unity_lock_font_face_get_category:
- * @self: a #UnityLockFontFace.
- *
- * Gets the group this face belongs to in a settings UI, or %NULL for the
- * default face.
- *
- * Returns: (transfer none) (nullable): the category name.
- */
-const gchar *unity_lock_font_face_get_category (UnityLockFontFace *self);
+const gchar *unity_lock_font_face_nick (UnityLockFontFaceStyle style);
 
 /**
  * unity_lock_font_face_load:
- * @self: a #UnityLockFontFace.
+ * @style: a #UnityLockFontFaceStyle.
  *
- * Registers this face's bundled font with the shared font map, extracting it
- * from the gresource on the first call. Later calls are cheap.
+ * Loads the font for @style out of the gresource and registers it with the font
+ * map from unity_lock_font_face_get_font_map(). Loading happens once per style,
+ * and a style that failed once is not retried.
  *
- * Returns: %TRUE once the font is usable. %FALSE for the default face, which has
- *   no bundled font, and on failure.
+ * Returns: %TRUE when the font is registered and can be used. %FALSE for
+ *   %UNITY_LOCK_FONT_FACE_STYLE_DEFAULT, which has no font of its own, and for a
+ *   font that could not be read.
  */
-gboolean unity_lock_font_face_load (UnityLockFontFace *self);
+gboolean unity_lock_font_face_load (UnityLockFontFaceStyle style);
 
 /**
  * unity_lock_font_face_get_font_map:
  *
- * Gets the font map holding the bundled faces. Set it on a widget with
- * gtk_widget_set_font_map() before selecting a face on that widget.
+ * Gets the font map the bundled faces are registered with. Apply it to a widget
+ * with gtk_widget_set_font_map() so the widget can resolve them.
  *
  * Returns: (transfer none): the shared #PangoFontMap.
  */

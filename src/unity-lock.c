@@ -20,6 +20,7 @@
 
 #include "unity-lock.h"
 
+#include "unity-lock-background.h"
 #include "unity-lock-datetime-page.h"
 #include "unity-lock-user-page.h"
 
@@ -194,7 +195,16 @@ unity_lock_constructed (GObject *object)
 
   if (!self->primary)
     {
-      gtk_widget_set_visible (GTK_WIDGET (self->carousel), FALSE);
+      GtkWidget *wallpaper = gtk_picture_new ();
+
+      gtk_picture_set_content_fit (GTK_PICTURE (wallpaper), GTK_CONTENT_FIT_COVER);
+      gtk_picture_set_paintable (GTK_PICTURE (wallpaper), unity_lock_background_get ());
+
+      adw_application_window_set_content (ADW_APPLICATION_WINDOW (self), wallpaper);
+      self->carousel = NULL;
+
+      gtk_widget_action_set_enabled (GTK_WIDGET (self), "lock.back", FALSE);
+
       return;
     }
 

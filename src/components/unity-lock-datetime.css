@@ -1,6 +1,6 @@
 /* Type layout for the clock block, then one rule set per clock face.
  *
- * Face classes are named after the org.unity.Lock style nick, which is also the
+ * Face classes are named after the org.unity.lock style nick, which is also the
  * font filename in data/fonts. UnityLockDatetime puts one of them on itself.
  * The `default` style has no rule set and inherits the session font.
  *

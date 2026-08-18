@@ -24,32 +24,7 @@
 #include <pango/pangocairo.h>
 
 #define FONT_RESOURCE_PREFIX "/org/unity/Lock/fonts/"
-
-typedef struct
-{
-  const gchar *label;
-  const gchar *category;
-} FaceSpec;
-
-static const FaceSpec specs[] = {
-  [UNITY_LOCK_FONT_FACE_STYLE_DEFAULT]              = { "Default", NULL },
-  [UNITY_LOCK_FONT_FACE_STYLE_FRAUNCES]             = { "Fraunces", "Serif" },
-  [UNITY_LOCK_FONT_FACE_STYLE_BITCOUNT_PROP_SINGLE] = { "Bitcount", "Pixel" },
-  [UNITY_LOCK_FONT_FACE_STYLE_PRESS_START_2P]       = { "Press Start 2P", "Pixel" },
-  [UNITY_LOCK_FONT_FACE_STYLE_SIXTYFOUR]            = { "Sixtyfour", "Pixel" },
-  [UNITY_LOCK_FONT_FACE_STYLE_AUDIOWIDE]            = { "Audiowide", "Futuristic" },
-  [UNITY_LOCK_FONT_FACE_STYLE_MICHROMA]             = { "Michroma", "Futuristic" },
-  [UNITY_LOCK_FONT_FACE_STYLE_TOURNEY]              = { "Tourney", "Futuristic" },
-  [UNITY_LOCK_FONT_FACE_STYLE_BAGEL_FAT_ONE]        = { "Bagel Fat One", "Playful" },
-  [UNITY_LOCK_FONT_FACE_STYLE_DYNAPUFF]             = { "DynaPuff", "Playful" },
-  [UNITY_LOCK_FONT_FACE_STYLE_KABLAMMO]             = { "Kablammo", "Playful" },
-  [UNITY_LOCK_FONT_FACE_STYLE_RUBIK_GLITCH]         = { "Rubik Glitch", "Playful" },
-  [UNITY_LOCK_FONT_FACE_STYLE_EWERT]                = { "Ewert", "Retro" },
-  [UNITY_LOCK_FONT_FACE_STYLE_LIMELIGHT]            = { "Limelight", "Retro" },
-  [UNITY_LOCK_FONT_FACE_STYLE_CLIMATE_CRISIS]       = { "Climate Crisis", "Expressive" },
-};
-
-G_STATIC_ASSERT (G_N_ELEMENTS (specs) == UNITY_LOCK_FONT_FACE_STYLE_CLIMATE_CRISIS + 1);
+#define N_STYLES (UNITY_LOCK_FONT_FACE_STYLE_CLIMATE_CRISIS + 1)
 
 G_DEFINE_ENUM_TYPE (
   UnityLockFontFaceStyle, unity_lock_font_face_style,
@@ -69,101 +44,18 @@ G_DEFINE_ENUM_TYPE (
   G_DEFINE_ENUM_VALUE (UNITY_LOCK_FONT_FACE_STYLE_LIMELIGHT, "limelight"),
   G_DEFINE_ENUM_VALUE (UNITY_LOCK_FONT_FACE_STYLE_CLIMATE_CRISIS, "climate-crisis"))
 
-struct _UnityLockFontFace
-{
-  GObject parent_instance;
-
-  const FaceSpec *spec;
-  const gchar    *nick;
-  gboolean        loaded;
-  gboolean        failed;
-};
-
-G_DEFINE_FINAL_TYPE (UnityLockFontFace, unity_lock_font_face, G_TYPE_OBJECT)
-
-UnityLockFontFaceStyle
-unity_lock_font_face_get_style (UnityLockFontFace *self)
-{
-  g_return_val_if_fail (UNITY_LOCK_IS_FONT_FACE (self), UNITY_LOCK_FONT_FACE_STYLE_DEFAULT);
-
-  return (UnityLockFontFaceStyle) (self->spec - specs);
-}
-
 const gchar *
-unity_lock_font_face_get_nick (UnityLockFontFace *self)
+unity_lock_font_face_nick (UnityLockFontFaceStyle style)
 {
-  g_return_val_if_fail (UNITY_LOCK_IS_FONT_FACE (self), NULL);
+  static GEnumClass *styles;
+  GEnumValue *value;
 
-  return self->nick;
-}
+  if (g_once_init_enter_pointer (&styles))
+    g_once_init_leave_pointer (&styles, g_type_class_ref (UNITY_LOCK_TYPE_FONT_FACE_STYLE));
 
-const gchar *
-unity_lock_font_face_get_label (UnityLockFontFace *self)
-{
-  g_return_val_if_fail (UNITY_LOCK_IS_FONT_FACE (self), NULL);
+  value = g_enum_get_value (styles, (gint) style);
 
-  return self->spec->label;
-}
-
-const gchar *
-unity_lock_font_face_get_category (UnityLockFontFace *self)
-{
-  g_return_val_if_fail (UNITY_LOCK_IS_FONT_FACE (self), NULL);
-
-  return self->spec->category;
-}
-
-static void
-unity_lock_font_face_class_init (UnityLockFontFaceClass *klass)
-{
-  (void) klass;
-}
-
-static void
-unity_lock_font_face_init (UnityLockFontFace *self)
-{
-  self->spec = &specs[UNITY_LOCK_FONT_FACE_STYLE_DEFAULT];
-}
-
-GListModel *
-unity_lock_font_face_get_all (void)
-{
-  static GListStore *store;
-
-  if (g_once_init_enter (&store))
-    {
-      GListStore *faces = g_list_store_new (UNITY_LOCK_TYPE_FONT_FACE);
-      GEnumClass *styles = g_type_class_ref (UNITY_LOCK_TYPE_FONT_FACE_STYLE);
-
-      for (guint i = 0; i < G_N_ELEMENTS (specs); i++)
-        {
-          g_autoptr (UnityLockFontFace) face = g_object_new (UNITY_LOCK_TYPE_FONT_FACE, NULL);
-          GEnumValue *style = g_enum_get_value (styles, (gint) i);
-
-          face->spec = &specs[i];
-          face->nick = style->value_nick;
-          g_list_store_append (faces, face);
-        }
-
-      g_type_class_unref (styles);
-
-      g_once_init_leave (&store, faces);
-    }
-
-  return G_LIST_MODEL (store);
-}
-
-UnityLockFontFace *
-unity_lock_font_face_for_style (UnityLockFontFaceStyle style)
-{
-  GListModel *model = unity_lock_font_face_get_all ();
-
-  if ((guint) style >= g_list_model_get_n_items (model))
-    style = UNITY_LOCK_FONT_FACE_STYLE_DEFAULT;
-
-  g_autoptr (UnityLockFontFace) face = g_list_model_get_item (model, style);
-
-  return face;
+  return value != NULL ? value->value_nick : NULL;
 }
 
 PangoFontMap *
@@ -171,12 +63,21 @@ unity_lock_font_face_get_font_map (void)
 {
   static PangoFontMap *map;
 
-  if (g_once_init_enter (&map))
-    g_once_init_leave (&map, pango_cairo_font_map_new ());
+  if (g_once_init_enter_pointer (&map))
+    g_once_init_leave_pointer (&map, pango_cairo_font_map_new ());
 
   return map;
 }
 
+/* Pango takes a path rather than bytes, so each face is written to a temp file.
+ *
+ * The file has to survive for the life of the process. Cairo reopens it by path
+ * every time it builds a scaled font for a size it has not cached yet, so
+ * unlinking once the face is registered looks fine until the first resize and
+ * then fails with "file not found" and renders nothing. Measured: a face still
+ * resolves at an already used size after an unlink, but at a new size the ink
+ * width drops to 0. The breakpoints change the clock size, so this would break
+ * on any resize. Do not shorten the lifetime. */
 static GPtrArray *staged_fonts;
 
 static void
@@ -229,18 +130,20 @@ register_font (GBytes      *bytes,
 }
 
 gboolean
-unity_lock_font_face_load (UnityLockFontFace *self)
+unity_lock_font_face_load (UnityLockFontFaceStyle style)
 {
-  g_return_val_if_fail (UNITY_LOCK_IS_FONT_FACE (self), FALSE);
+  static gboolean loaded[N_STYLES];
+  static gboolean failed[N_STYLES];
 
-  if (unity_lock_font_face_get_style (self) == UNITY_LOCK_FONT_FACE_STYLE_DEFAULT)
+  const gchar *nick = unity_lock_font_face_nick (style);
+
+  if (nick == NULL || style == UNITY_LOCK_FONT_FACE_STYLE_DEFAULT)
     return FALSE;
 
-  if (self->loaded || self->failed)
-    return self->loaded;
+  if (loaded[style] || failed[style])
+    return loaded[style];
 
-  g_autofree gchar *resource =
-    g_strconcat (FONT_RESOURCE_PREFIX, self->nick, ".ttf", NULL);
+  g_autofree gchar *resource = g_strconcat (FONT_RESOURCE_PREFIX, nick, ".ttf", NULL);
   g_autoptr (GError) error = NULL;
   g_autoptr (GBytes) bytes =
     g_resources_lookup_data (resource, G_RESOURCE_LOOKUP_FLAGS_NONE, &error);
@@ -248,9 +151,9 @@ unity_lock_font_face_load (UnityLockFontFace *self)
   if (bytes == NULL)
     g_warning ("Failed to read %s: %s", resource, error->message);
   else
-    self->loaded = register_font (bytes, resource);
+    loaded[style] = register_font (bytes, resource);
 
-  self->failed = !self->loaded;
+  failed[style] = !loaded[style];
 
-  return self->loaded;
+  return loaded[style];
 }

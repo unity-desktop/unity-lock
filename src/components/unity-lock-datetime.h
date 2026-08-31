@@ -22,7 +22,6 @@
 
 #include <adwaita.h>
 
-
 G_BEGIN_DECLS
 
 /**
@@ -41,9 +40,10 @@ G_BEGIN_DECLS
  * updates every instance, including one already on screen. Setting the matching
  * property overrides the key until it next changes.
  *
- * Type sizes come from unity-lock-datetime.ui, where the time carries a scale
- * attribute and the date carries the libadwaita .title-2 style class. A face only
- * contributes a font family, its variation axes and a relative size correction.
+ * Type sizes come from unity-lock-datetime.css. An #AdwBreakpoint swaps one size
+ * class on the clock box, and the date carries the libadwaita .title-2 style class.
+ * A face only contributes a font family, its variation axes and a relative size
+ * correction.
  */
 G_DECLARE_FINAL_TYPE (UnityLockDatetime, unity_lock_datetime, UNITY_LOCK, DATETIME, AdwBin)
 

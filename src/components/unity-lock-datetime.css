@@ -1,19 +1,16 @@
-/* Type layout for the clock block, then one rule set per clock face.
- *
- * Face classes are named after the org.unity.lock style nick, which is also the
- * font filename in data/fonts. UnityLockDatetime puts one of them on itself.
- * The `default` style has no rule set and inherits the session font.
- *
- * Sizes here are always relative. The time takes its size from the scale
- * property, which an #AdwBreakpoint drives, and the date from libadwaita's
- * .title-2, so the theme font size and text scaling both still apply.
- */
+/* One rule set per clock face, keyed on the org.unity.lock style nick. */
 
 .unity-lock-time,
 .unity-lock-date {
   margin: 0;
   padding: 0;
 }
+
+/* The size ladder. AdwBreakpoint swaps one class on the clock box. em multiplies
+ * the inherited size, so a face's own font-size still counts. */
+.unity-lock-size-large  .unity-lock-time { font-size: 10em; }
+.unity-lock-size-medium .unity-lock-time { font-size: 7em; }
+.unity-lock-size-small  .unity-lock-time { font-size: 4em; }
 
 .unity-lock-time {
   font-feature-settings: "tnum" 1;
@@ -26,17 +23,9 @@
   letter-spacing: 0.01em;
 }
 
-/* Optical corrections.
- *
- * Pinning line-height above makes the label boxes identical for every face, but
- * the eye reads ink, not boxes. How much of its em box a face fills varies a
- * lot. Press Start 2P draws 67px of ink in a 77px box, Bagel Fat One draws 100px
- * in 196px. Measured, the gap between date and time ran from 12px to 72px.
- *
- * Faces more than 7px off the 47px norm carry a margin on the time label to pull
- * them back. Each records the gap it corrects. Values are in em so they track
- * the font size of the label they apply to.
- */
+/* Optical corrections. Faces fill their em box differently, so some carry a margin
+ * to line the time up with the date. Calibrated at scale 10 only, the em does not
+ * follow the scale property. */
 
 .fraunces {
   font-family: "Fraunces";
@@ -48,9 +37,8 @@
   font-variation-settings: "wght" 400;
 }
 
-/* was 54px */
 .bitcount-prop-single .unity-lock-time {
-  margin-top: -0.48em;
+  margin-top: -0.048em;
 }
 
 .press-start-2p {
@@ -58,9 +46,8 @@
   font-size: 0.52em;
 }
 
-/* was 12px, a bitmap face with almost no built in slack */
 .press-start-2p .unity-lock-time {
-  margin-top: 4.59em;
+  margin-top: 0.459em;
 }
 
 .sixtyfour {
@@ -69,9 +56,8 @@
   font-size: 0.58em;
 }
 
-/* was 14px, same reason as Press Start 2P */
 .sixtyfour .unity-lock-time {
-  margin-top: 3.88em;
+  margin-top: 0.388em;
 }
 
 .audiowide {
@@ -84,9 +70,8 @@
   font-size: 0.72em;
 }
 
-/* was 55px */
 .michroma .unity-lock-time {
-  margin-top: -0.76em;
+  margin-top: -0.076em;
 }
 
 .tourney {
@@ -99,9 +84,8 @@
   font-size: 0.92em;
 }
 
-/* was 72px, the face reserves a lot of room for accents */
 .bagel-fat-one .unity-lock-time {
-  margin-top: -1.85em;
+  margin-top: -0.185em;
 }
 
 .dynapuff {

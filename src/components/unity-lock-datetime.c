@@ -20,6 +20,7 @@
 
 #include "unity-lock-datetime.h"
 
+#include <glib/gi18n.h>
 #include <libgnome-desktop/gnome-wall-clock.h>
 
 #include "unity-lock-font-face.h"
@@ -36,18 +37,11 @@ struct _UnityLockDatetime
 
   UnityLockFontFaceStyle style;
   UnityLockFontFaceStyle applied_style;
-  gdouble                scale;
 
   GnomeWallClock *clock;
   GSettings      *interface;
   GSettings      *lock;
 };
-
-typedef enum {
-  PROP_SCALE = 1,
-} UnityLockDatetimeProps;
-
-static GParamSpec *props[PROP_SCALE + 1];
 
 G_DEFINE_FINAL_TYPE (UnityLockDatetime, unity_lock_datetime, ADW_TYPE_BIN)
 
@@ -81,22 +75,23 @@ apply_style (UnityLockDatetime *self)
 }
 
 static void
-apply_scale (UnityLockDatetime *self)
-{
-  g_autoptr (PangoAttrList) attrs = pango_attr_list_new ();
-
-  pango_attr_list_insert (attrs, pango_attr_scale_new (self->scale));
-  gtk_label_set_attributes (self->time_label, attrs);
-}
-
-static void
 update_time (UnityLockDatetime *self)
 {
   g_autoptr (GDateTime) now = g_date_time_new_now_local ();
-  g_autofree gchar *format = g_settings_get_string (self->interface, "clock-format");
-  gboolean twelve_hour = g_strcmp0 (format, "12h") == 0;
+  gboolean twelve_hour = FALSE;
+
+  if (self->interface != NULL)
+    {
+      g_autofree gchar *format = g_settings_get_string (self->interface, "clock-format");
+
+      twelve_hour = g_strcmp0 (format, "12h") == 0;
+    }
+
   g_autofree gchar *time_text = g_date_time_format (now, twelve_hour ? "%I:%M %p" : "%H:%M");
-  g_autofree gchar *date_text = g_date_time_format (now, "%A, %B %-e");
+  /* Translators: this is a strftime format for the date under the clock.
+     Reorder the fields for your locale. %A is the weekday, %B the month name
+     and %-e the day of the month with no leading zero. */
+  g_autofree gchar *date_text = g_date_time_format (now, _("%A, %B %-e"));
 
   gtk_label_set_text (self->time_label, time_text);
   gtk_label_set_text (self->date_label, date_text);
@@ -121,74 +116,41 @@ on_show_date_changed (UnityLockDatetime *self)
                           g_settings_get_boolean (self->lock, "show-date"));
 }
 
-static void
-set_scale (UnityLockDatetime *self,
-           gdouble            scale)
+/* g_settings_new aborts when a schema is missing, and an abort while the session
+ * lock is held leaves the user with a blocked screen and no way in. So look every
+ * schema up first and carry on without it. */
+static GSettings *
+settings_or_null (const gchar *schema_id)
 {
-  if (self->scale == scale)
-    return;
+  GSettingsSchemaSource *source = g_settings_schema_source_get_default ();
+  g_autoptr (GSettingsSchema) schema =
+    source != NULL ? g_settings_schema_source_lookup (source, schema_id, TRUE) : NULL;
 
-  self->scale = scale;
-  apply_scale (self);
-
-  g_object_notify_by_pspec (G_OBJECT (self), props[PROP_SCALE]);
-}
-
-static void
-unity_lock_datetime_get_property (GObject    *object,
-                                  guint       prop_id,
-                                  GValue     *value,
-                                  GParamSpec *pspec)
-{
-  UnityLockDatetime *self = UNITY_LOCK_DATETIME (object);
-
-
-  switch ((UnityLockDatetimeProps) prop_id)
+  if (schema == NULL)
     {
-    case PROP_SCALE:
-      g_value_set_double (value, self->scale);
-      break;
+      g_debug ("%s is not installed", schema_id);
+      return NULL;
     }
-}
 
-static void
-unity_lock_datetime_set_property (GObject      *object,
-                                  guint         prop_id,
-                                  const GValue *value,
-                                  GParamSpec   *pspec)
-{
-  UnityLockDatetime *self = UNITY_LOCK_DATETIME (object);
-
-
-  switch ((UnityLockDatetimeProps) prop_id)
-    {
-    case PROP_SCALE:
-      set_scale (self, g_value_get_double (value));
-      break;
-    }
+  return g_settings_new_full (schema, NULL, NULL);
 }
 
 static void
 unity_lock_datetime_constructed (GObject *object)
 {
   UnityLockDatetime *self = UNITY_LOCK_DATETIME (object);
-  GSettingsSchemaSource *source;
 
   G_OBJECT_CLASS (unity_lock_datetime_parent_class)->constructed (object);
 
-  self->interface = g_settings_new (INTERFACE_SCHEMA);
-  g_signal_connect_object (self->interface, "changed::clock-format",
-                           G_CALLBACK (update_time), self, G_CONNECT_SWAPPED);
+  self->interface = settings_or_null (INTERFACE_SCHEMA);
+  self->lock      = settings_or_null (LOCK_SCHEMA);
 
-  source = g_settings_schema_source_get_default ();
+  if (self->interface != NULL)
+    g_signal_connect_object (self->interface, "changed::clock-format",
+                             G_CALLBACK (update_time), self, G_CONNECT_SWAPPED);
 
-  g_autoptr (GSettingsSchema) schema =
-    source != NULL ? g_settings_schema_source_lookup (source, LOCK_SCHEMA, TRUE) : NULL;
-
-  if (schema != NULL)
+  if (self->lock != NULL)
     {
-      self->lock = g_settings_new_full (schema, NULL, NULL);
-
       g_signal_connect_object (self->lock, "changed::style",
                                G_CALLBACK (on_style_changed), self, G_CONNECT_SWAPPED);
       g_signal_connect_object (self->lock, "changed::show-date",
@@ -199,17 +161,12 @@ unity_lock_datetime_constructed (GObject *object)
       gtk_widget_set_visible (GTK_WIDGET (self->date_label),
                               g_settings_get_boolean (self->lock, "show-date"));
     }
-  else
-    {
-      g_debug ("%s is not installed, falling back to the session font", LOCK_SCHEMA);
-    }
 
   self->clock = gnome_wall_clock_new ();
   g_signal_connect_object (self->clock, "notify::clock",
                            G_CALLBACK (update_time), self, G_CONNECT_SWAPPED);
 
   apply_style (self);
-  apply_scale (self);
   update_time (self);
 }
 
@@ -217,6 +174,8 @@ static void
 unity_lock_datetime_dispose (GObject *object)
 {
   UnityLockDatetime *self = UNITY_LOCK_DATETIME (object);
+
+  gtk_widget_dispose_template (GTK_WIDGET (self), UNITY_LOCK_TYPE_DATETIME);
 
   g_clear_object (&self->clock);
   g_clear_object (&self->interface);
@@ -231,23 +190,8 @@ unity_lock_datetime_class_init (UnityLockDatetimeClass *klass)
   GObjectClass *object_class = G_OBJECT_CLASS (klass);
   GtkWidgetClass *widget_class = GTK_WIDGET_CLASS (klass);
 
-  object_class->get_property = unity_lock_datetime_get_property;
-  object_class->set_property = unity_lock_datetime_set_property;
   object_class->constructed = unity_lock_datetime_constructed;
   object_class->dispose = unity_lock_datetime_dispose;
-
-  /**
-   * UnityLockDatetime:scale:
-   *
-   * How much larger than the theme font the time is drawn. Meant to be driven by
-   * an #AdwBreakpoint so the clock never overflows a narrow surface.
-   */
-  props[PROP_SCALE] =
-    g_param_spec_double ("scale", NULL, NULL,
-                         0.1, 10.0, 10.0,
-                         G_PARAM_READWRITE | G_PARAM_EXPLICIT_NOTIFY | G_PARAM_STATIC_STRINGS);
-
-  g_object_class_install_properties (object_class, G_N_ELEMENTS (props), props);
 
   gtk_widget_class_set_template_from_resource (widget_class,
                                                "/org/unity/Lock/unity-lock-datetime.ui");
@@ -258,7 +202,5 @@ unity_lock_datetime_class_init (UnityLockDatetimeClass *klass)
 static void
 unity_lock_datetime_init (UnityLockDatetime *self)
 {
-  self->scale = 10.0;
-
   gtk_widget_init_template (GTK_WIDGET (self));
 }

@@ -4,33 +4,54 @@
   <requires lib="libadwaita" version="1.4"/>
   <template class="UnityLockDatetime" parent="AdwBin">
     <property name="child">
-      <object class="GtkBox">
-        <property name="orientation">vertical</property>
-        <property name="halign">center</property>
-        <property name="valign">center</property>
-        <property name="spacing">12</property>
+      <object class="AdwBreakpointBin">
+        <property name="hexpand">true</property>
+        <property name="vexpand">true</property>
+        <property name="width-request">200</property>
+        <property name="height-request">100</property>
         <child>
-          <object class="GtkLabel" id="date_label">
-            <property name="justify">center</property>
-            <property name="wrap">true</property>
-            <property name="max-width-chars">28</property>
-            <style>
-              <class name="title-2"/>
-              <class name="body"/>
-              <class name="unity-lock-date"/>
-              <class name="unity-lock-text"/>
-            </style>
+          <object class="AdwBreakpoint">
+            <condition>max-width: 600sp</condition>
+            <setter object="clock_box" property="css-classes">unity-lock-size-medium</setter>
           </object>
         </child>
         <child>
-          <object class="GtkLabel" id="time_label">
-            <property name="justify">center</property>
-            <style>
-              <class name="unity-lock-time"/>
-              <class name="unity-lock-text"/>
-            </style>
+          <object class="AdwBreakpoint">
+            <condition>max-width: 400sp</condition>
+            <setter object="clock_box" property="css-classes">unity-lock-size-small</setter>
           </object>
         </child>
+        <property name="child">
+          <object class="GtkBox" id="clock_box">
+            <property name="orientation">vertical</property>
+            <property name="halign">center</property>
+            <property name="valign">center</property>
+            <property name="spacing">12</property>
+            <property name="css-classes">unity-lock-size-large</property>
+            <child>
+              <object class="GtkLabel" id="date_label">
+                <property name="justify">center</property>
+                <property name="wrap">true</property>
+                <property name="max-width-chars">28</property>
+                <style>
+                  <class name="title-2"/>
+                  <class name="body"/>
+                  <class name="unity-lock-date"/>
+                  <class name="unity-lock-text"/>
+                </style>
+              </object>
+            </child>
+            <child>
+              <object class="GtkLabel" id="time_label">
+                <property name="justify">center</property>
+                <style>
+                  <class name="unity-lock-time"/>
+                  <class name="unity-lock-text"/>
+                </style>
+              </object>
+            </child>
+          </object>
+        </property>
       </object>
     </property>
   </template>

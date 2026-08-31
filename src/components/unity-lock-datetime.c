@@ -142,7 +142,6 @@ unity_lock_datetime_get_property (GObject    *object,
 {
   UnityLockDatetime *self = UNITY_LOCK_DATETIME (object);
 
-  (void) pspec;
 
   switch ((UnityLockDatetimeProps) prop_id)
     {
@@ -160,7 +159,6 @@ unity_lock_datetime_set_property (GObject      *object,
 {
   UnityLockDatetime *self = UNITY_LOCK_DATETIME (object);
 
-  (void) pspec;
 
   switch ((UnityLockDatetimeProps) prop_id)
     {

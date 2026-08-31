@@ -106,7 +106,9 @@ reset_entry (UnityLockUserPage *self)
 }
 
 static void
-on_busy_changed (UnityLockUserPage *self)
+on_busy_changed (GObject           *object,
+                 GParamSpec        *pspec,
+                 UnityLockUserPage *self)
 {
   gboolean busy = unity_lock_conversation_get_busy (self->conversation);
   gtk_widget_set_sensitive (GTK_WIDGET (self->password), !busy);
@@ -114,13 +116,12 @@ on_busy_changed (UnityLockUserPage *self)
 }
 
 static void
-on_prompt (UnityLockUserPage *self,
-           const gchar       *message,
-           gboolean           visible)
+on_prompt (UnityLockConversation *conversation,
+           const gchar           *message,
+           gboolean               visible,
+           UnityLockUserPage     *self)
 {
   g_autofree gchar *title = prompt_title (message);
-
-  (void) visible;
 
   adw_preferences_row_set_title (ADW_PREFERENCES_ROW (self->password), title);
   gtk_editable_set_text (GTK_EDITABLE (self->password), "");
@@ -128,22 +129,25 @@ on_prompt (UnityLockUserPage *self,
 }
 
 static void
-on_message (UnityLockUserPage *self,
-            const gchar       *text,
-            gboolean           is_error)
+on_message (UnityLockConversation *conversation,
+            const gchar           *text,
+            gboolean               is_error,
+            UnityLockUserPage     *self)
 {
   show_message (self, text, is_error ? "error" : "dim-label");
 }
 
 static void
-on_authenticated (UnityLockUserPage *self)
+on_authenticated (UnityLockConversation *conversation,
+                  UnityLockUserPage     *self)
 {
   g_signal_emit (self, signals[SIGNAL_UNLOCKED], 0);
 }
 
 static void
-on_failed (UnityLockUserPage *self,
-           const gchar       *message)
+on_failed (UnityLockConversation *conversation,
+           const gchar           *message,
+           UnityLockUserPage     *self)
 {
   show_message (self, message ? message : _("Authentication failed"), "error");
   reset_entry (self);
@@ -162,8 +166,6 @@ static void
 on_submit (GtkWidget *row,
            gpointer   user_data)
 {
-  (void) row;
-
   submit (UNITY_LOCK_USER_PAGE (user_data));
 }
 
@@ -229,6 +231,12 @@ unity_lock_user_page_set_active (UnityLockUserPage *self,
   if (active)
     {
       gtk_widget_grab_focus (GTK_WIDGET (self));
+
+      /* GtkText selects everything it holds when it takes focus, and this page
+         may already carry the characters that brought the user here. Put the
+         cursor at the end so the next keystroke adds to them rather than
+         replacing them. */
+      gtk_editable_set_position (GTK_EDITABLE (self->password), -1);
       return;
     }
 
@@ -261,15 +269,15 @@ unity_lock_user_page_constructed (GObject *object)
   self->conversation = unity_lock_conversation_new ();
 
   g_signal_connect_object (self->conversation, "prompt",
-                           G_CALLBACK (on_prompt), self, G_CONNECT_SWAPPED);
+                           G_CALLBACK (on_prompt), self, G_CONNECT_DEFAULT);
   g_signal_connect_object (self->conversation, "message",
-                           G_CALLBACK (on_message), self, G_CONNECT_SWAPPED);
+                           G_CALLBACK (on_message), self, G_CONNECT_DEFAULT);
   g_signal_connect_object (self->conversation, "authenticated",
-                           G_CALLBACK (on_authenticated), self, G_CONNECT_SWAPPED);
+                           G_CALLBACK (on_authenticated), self, G_CONNECT_DEFAULT);
   g_signal_connect_object (self->conversation, "failed",
-                           G_CALLBACK (on_failed), self, G_CONNECT_SWAPPED);
+                           G_CALLBACK (on_failed), self, G_CONNECT_DEFAULT);
   g_signal_connect_object (self->conversation, "notify::busy",
-                           G_CALLBACK (on_busy_changed), self, G_CONNECT_SWAPPED);
+                           G_CALLBACK (on_busy_changed), self, G_CONNECT_DEFAULT);
 
   manager = act_user_manager_get_default ();
   self->user = g_object_ref (act_user_manager_get_user (manager, g_get_user_name ()));
@@ -280,7 +288,7 @@ unity_lock_user_page_constructed (GObject *object)
                            G_CALLBACK (update_user), self, G_CONNECT_SWAPPED);
 
   update_user (self);
-  on_busy_changed (self);
+  on_busy_changed (NULL, NULL, self);
 }
 
 static void

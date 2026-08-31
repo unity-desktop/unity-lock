@@ -11,12 +11,6 @@ unity_lock_deps = [
   dep_layershell,
 ]
 
-configure_file(
-  input:         'unity-lock-defs.h.in',
-  output:        'unity-lock-defs.h',
-  configuration: mirror_conf,
-)
-
 unity_lock_sources = files(
   'main.c',
   'unity-lock.c',

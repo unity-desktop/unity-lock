@@ -28,15 +28,11 @@
 #include "unity-lock.h"
 
 static GtkSessionLockInstance *lock_instance;
-static gboolean                have_primary;
 
 static void
 on_monitor (GtkSessionLockInstance *instance, GdkMonitor *monitor, gpointer user_data)
 {
-  gboolean primary = !have_primary;
-  have_primary = TRUE;
-
-  GtkWindow *lock = unity_lock_new (GTK_APPLICATION (user_data), primary);
+  GtkWindow *lock = unity_lock_new (GTK_APPLICATION (user_data));
 
   g_signal_connect_swapped (lock, "unlocked",
                             G_CALLBACK (gtk_session_lock_instance_unlock), instance);
@@ -47,7 +43,6 @@ on_monitor (GtkSessionLockInstance *instance, GdkMonitor *monitor, gpointer user
 static void
 on_failed (GtkSessionLockInstance *instance, gpointer user_data)
 {
-  (void) instance;
   g_warning ("could not acquire the session lock");
   g_application_release (G_APPLICATION (user_data));
 }
@@ -55,15 +50,12 @@ on_failed (GtkSessionLockInstance *instance, gpointer user_data)
 static void
 on_unlocked (GtkSessionLockInstance *instance, gpointer user_data)
 {
-  (void) instance;
   g_application_release (G_APPLICATION (user_data));
 }
 
 static void
 on_activate (GApplication *app, gpointer user_data)
 {
-  (void) user_data;
-
   if (lock_instance != NULL)
     return;
 

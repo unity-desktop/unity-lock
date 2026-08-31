@@ -30,14 +30,13 @@ gettext_package = meson.project_name()
 
 mirror_root = '/var/lib/unity-greeter'
 
-mirror_conf = configuration_data()
-mirror_conf.set('mirror_root', mirror_root)
-
 add_project_arguments(
   '-DGNOME_DESKTOP_USE_UNSTABLE_API',
   '-DGETTEXT_PACKAGE="' + gettext_package + '"',
   '-DUNITY_LOCK_LOCALEDIR="' + get_option('prefix') / get_option('localedir') + '"',
   '-DUNITY_LOCK_VERSION="' + meson.project_version() + '"',
+  '-DUNITY_LOCK_MIRROR_ROOT="' + mirror_root + '"',
+  '-Wno-unused-parameter',
   language: 'c',
 )
 

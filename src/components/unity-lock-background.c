@@ -20,7 +20,6 @@
 
 #include "unity-lock-background.h"
 
-#include "unity-lock-defs.h"
 
 GdkPaintable *
 unity_lock_background_get (void)

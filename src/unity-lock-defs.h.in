@@ -1,8 +1,0 @@
-#pragma once
-
-/* Per-user asset root written by unity-shell and read by unity-greeter.
- * unity-shell renders the session wallpaper, already blurred and dimmed, to
- * <root>/<user>/background.png. unity-lock draws the same file, so the desktop,
- * the login screen and the lock screen all show one image. Contract shared with
- * unity-shell and unity-greeter, so all three must agree on this path. */
-#define UNITY_LOCK_MIRROR_ROOT  "@mirror_root@"

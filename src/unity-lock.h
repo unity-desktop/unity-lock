@@ -47,16 +47,14 @@ G_DECLARE_FINAL_TYPE (UnityLock, unity_lock, UNITY, LOCK, AdwApplicationWindow)
 /**
  * unity_lock_new:
  * @app: the application the surface belongs to.
- * @primary: %TRUE for the monitor that carries the clock and the prompt.
  *
- * Creates a lock surface. A primary surface shows the clock and the password
- * prompt and emits #UnityLock::unlocked once PAM accepts the password. Every
- * other surface shows only the wallpaper.
+ * Creates a lock surface. Every surface shows the clock, takes the password and
+ * emits #UnityLock::unlocked once PAM accepts it, so removing a monitor never
+ * takes the only prompt away with it.
  *
  * Returns: (transfer none): a new #UnityLock. Ownership passes to the session
  *   lock once the window is assigned to a monitor.
  */
-GtkWindow *unity_lock_new (GtkApplication *app,
-                           gboolean        primary);
+GtkWindow *unity_lock_new (GtkApplication *app);
 
 G_END_DECLS

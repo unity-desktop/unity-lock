@@ -20,7 +20,6 @@
 
 #include "unity-lock.h"
 
-#include "unity-lock-background.h"
 #include "unity-lock-datetime-page.h"
 #include "unity-lock-user-page.h"
 
@@ -32,8 +31,6 @@ struct _UnityLock
   AdwApplicationWindow parent_instance;
 
   AdwCarousel *carousel;
-
-  gboolean primary;
 };
 
 enum {
@@ -41,12 +38,7 @@ enum {
   N_SIGNALS,
 };
 
-typedef enum {
-  PROP_PRIMARY = 1,
-} UnityLockProps;
-
 static guint signals[N_SIGNALS];
-static GParamSpec *props[PROP_PRIMARY + 1];
 
 G_DEFINE_FINAL_TYPE (UnityLock, unity_lock, ADW_TYPE_APPLICATION_WINDOW)
 
@@ -74,7 +66,7 @@ scroll_to (UnityLock *self,
 static void
 reveal (UnityLock *self)
 {
-  if (!self->primary || on_login_page (self))
+  if (on_login_page (self))
     return;
 
   scroll_to (self, PAGE_LOGIN);
@@ -85,9 +77,6 @@ back_cb (GtkWidget   *widget,
          const gchar *action_name,
          GVariant    *parameter)
 {
-  (void) action_name;
-  (void) parameter;
-
   scroll_to (UNITY_LOCK (widget), PAGE_CLOCK);
 }
 
@@ -115,11 +104,6 @@ on_key_pressed (GtkEventControllerKey *controller,
   gboolean with_modifier;
   guint32 unicode;
 
-  (void) controller;
-  (void) keycode;
-
-  if (!self->primary)
-    return GDK_EVENT_PROPAGATE;
 
   if (on_login_page (self))
     {
@@ -162,88 +146,13 @@ on_click_pressed (GtkGestureClick *gesture,
                   gdouble          y,
                   gpointer         user_data)
 {
-  (void) gesture;
-  (void) n_press;
-  (void) x;
-  (void) y;
-
   reveal (UNITY_LOCK (user_data));
-}
-
-static void
-unity_lock_set_property (GObject      *object,
-                         guint         prop_id,
-                         const GValue *value,
-                         GParamSpec   *pspec)
-{
-  UnityLock *self = UNITY_LOCK (object);
-
-  if (prop_id == PROP_PRIMARY)
-    self->primary = g_value_get_boolean (value);
-  else
-    G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
-}
-
-static void
-unity_lock_constructed (GObject *object)
-{
-  UnityLock *self = UNITY_LOCK (object);
-  GtkEventController *key;
-  GtkGesture *click;
-
-  G_OBJECT_CLASS (unity_lock_parent_class)->constructed (object);
-
-  if (!self->primary)
-    {
-      GtkWidget *wallpaper = gtk_picture_new ();
-
-      gtk_picture_set_content_fit (GTK_PICTURE (wallpaper), GTK_CONTENT_FIT_COVER);
-      gtk_picture_set_paintable (GTK_PICTURE (wallpaper), unity_lock_background_get ());
-
-      adw_application_window_set_content (ADW_APPLICATION_WINDOW (self), wallpaper);
-      self->carousel = NULL;
-
-      gtk_widget_action_set_enabled (GTK_WIDGET (self), "lock.back", FALSE);
-
-      return;
-    }
-
-  g_signal_connect_object (user_page (self), "unlocked",
-                           G_CALLBACK (on_unlocked), self, G_CONNECT_SWAPPED);
-  g_signal_connect_object (self->carousel, "page-changed",
-                           G_CALLBACK (on_page_changed), self, G_CONNECT_SWAPPED);
-
-  key = gtk_event_controller_key_new ();
-  gtk_event_controller_set_propagation_phase (key, GTK_PHASE_CAPTURE);
-  g_signal_connect (key, "key-pressed", G_CALLBACK (on_key_pressed), self);
-  gtk_widget_add_controller (GTK_WIDGET (self), key);
-
-  click = gtk_gesture_click_new ();
-  g_signal_connect (click, "pressed", G_CALLBACK (on_click_pressed), self);
-  gtk_widget_add_controller (GTK_WIDGET (self), GTK_EVENT_CONTROLLER (click));
 }
 
 static void
 unity_lock_class_init (UnityLockClass *klass)
 {
-  GObjectClass *object_class = G_OBJECT_CLASS (klass);
   GtkWidgetClass *widget_class = GTK_WIDGET_CLASS (klass);
-
-  object_class->set_property = unity_lock_set_property;
-  object_class->constructed = unity_lock_constructed;
-
-  /**
-   * UnityLock:primary:
-   *
-   * Whether this surface carries the clock and the prompt. Only one monitor does.
-   *
-   * Set once at construction. Nothing reads it back, so it is write only.
-   */
-  props[PROP_PRIMARY] =
-    g_param_spec_boolean ("primary", NULL, NULL, FALSE,
-                          G_PARAM_WRITABLE | G_PARAM_CONSTRUCT_ONLY | G_PARAM_STATIC_STRINGS);
-
-  g_object_class_install_properties (object_class, G_N_ELEMENTS (props), props);
 
   /**
    * UnityLock::unlocked:
@@ -268,15 +177,30 @@ unity_lock_class_init (UnityLockClass *klass)
 static void
 unity_lock_init (UnityLock *self)
 {
+  GtkEventController *key;
+  GtkGesture *click;
+
   gtk_widget_init_template (GTK_WIDGET (self));
+
+  g_signal_connect_object (user_page (self), "unlocked",
+                           G_CALLBACK (on_unlocked), self, G_CONNECT_SWAPPED);
+  g_signal_connect_object (self->carousel, "page-changed",
+                           G_CALLBACK (on_page_changed), self, G_CONNECT_SWAPPED);
+
+  key = gtk_event_controller_key_new ();
+  gtk_event_controller_set_propagation_phase (key, GTK_PHASE_CAPTURE);
+  g_signal_connect (key, "key-pressed", G_CALLBACK (on_key_pressed), self);
+  gtk_widget_add_controller (GTK_WIDGET (self), key);
+
+  click = gtk_gesture_click_new ();
+  g_signal_connect (click, "pressed", G_CALLBACK (on_click_pressed), self);
+  gtk_widget_add_controller (GTK_WIDGET (self), GTK_EVENT_CONTROLLER (click));
 }
 
 GtkWindow *
-unity_lock_new (GtkApplication *app,
-                gboolean        primary)
+unity_lock_new (GtkApplication *app)
 {
-  return g_object_new (UNITY_TYPE_LOCK,
-                       "application", app,
-                       "primary", primary,
-                       NULL);
+  g_return_val_if_fail (GTK_IS_APPLICATION (app), NULL);
+
+  return g_object_new (UNITY_TYPE_LOCK, "application", app, NULL);
 }

@@ -1,6 +1,8 @@
-# Please keep this file sorted alphabetically.
 # List of source files containing translatable strings.
+# Please keep this file sorted alphabetically.
+data/org.unity.lock.gschema.xml
 src/components/unity-lock-datetime-page.ui
+src/components/unity-lock-datetime.c
 src/components/unity-lock-user-page.c
 src/components/unity-lock-user-page.ui
 src/main.c

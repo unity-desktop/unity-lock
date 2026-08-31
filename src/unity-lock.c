@@ -150,9 +150,20 @@ on_click_pressed (GtkGestureClick *gesture,
 }
 
 static void
+unity_lock_dispose (GObject *object)
+{
+  gtk_widget_dispose_template (GTK_WIDGET (object), UNITY_TYPE_LOCK);
+
+  G_OBJECT_CLASS (unity_lock_parent_class)->dispose (object);
+}
+
+static void
 unity_lock_class_init (UnityLockClass *klass)
 {
+  GObjectClass *object_class = G_OBJECT_CLASS (klass);
   GtkWidgetClass *widget_class = GTK_WIDGET_CLASS (klass);
+
+  object_class->dispose = unity_lock_dispose;
 
   /**
    * UnityLock::unlocked:

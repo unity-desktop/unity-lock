@@ -84,6 +84,10 @@ void unity_lock_conversation_submit (UnityLockConversation *self,
  * Forgets any held secret and any waiting prompt, so the next
  * unity_lock_conversation_submit() starts a new attempt. Call this when the user leaves
  * the password prompt.
+ *
+ * This does not stop an exchange already in flight. AstalAuthPam offers no way to
+ * cancel one, so PAM may still answer afterwards and the caller has to decide
+ * whether that answer is still wanted.
  */
 void unity_lock_conversation_cancel (UnityLockConversation *self);
 

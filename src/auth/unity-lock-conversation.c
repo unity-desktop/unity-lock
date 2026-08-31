@@ -65,12 +65,13 @@ set_busy (UnityLockConversation *self,
 
 static void
 report_prompt (UnityLockConversation *self,
-               const gchar           *message)
+               const gchar           *message,
+               gboolean               visible)
 {
   self->awaiting = TRUE;
   set_busy (self, FALSE);
 
-  g_signal_emit (self, signals[SIGNAL_PROMPT], 0, message);
+  g_signal_emit (self, signals[SIGNAL_PROMPT], 0, message, visible);
 }
 
 static void
@@ -88,7 +89,7 @@ on_prompt_hidden (AstalAuthPam *pam,
       return;
     }
 
-  report_prompt (self, message);
+  report_prompt (self, message, FALSE);
 }
 
 static void
@@ -98,11 +99,10 @@ on_prompt_visible (AstalAuthPam *pam,
 {
   UnityLockConversation *self = user_data;
 
-  (void) pam;
 
   g_clear_pointer (&self->secret, g_free);
 
-  report_prompt (self, message);
+  report_prompt (self, message, TRUE);
 }
 
 static void
@@ -110,8 +110,6 @@ on_info (AstalAuthPam *pam,
          const gchar  *message,
          gpointer      user_data)
 {
-  (void) pam;
-
   g_signal_emit (user_data, signals[SIGNAL_MESSAGE], 0, message, FALSE);
 }
 
@@ -120,8 +118,6 @@ on_error (AstalAuthPam *pam,
           const gchar  *message,
           gpointer      user_data)
 {
-  (void) pam;
-
   g_signal_emit (user_data, signals[SIGNAL_MESSAGE], 0, message, TRUE);
 }
 
@@ -132,7 +128,6 @@ on_fail (AstalAuthPam *pam,
 {
   UnityLockConversation *self = user_data;
 
-  (void) pam;
 
   unity_lock_conversation_cancel (self);
 
@@ -145,7 +140,6 @@ on_success (AstalAuthPam *pam,
 {
   UnityLockConversation *self = user_data;
 
-  (void) pam;
 
   self->awaiting = FALSE;
   set_busy (self, FALSE);
@@ -203,7 +197,6 @@ unity_lock_conversation_get_property (GObject    *object,
 {
   UnityLockConversation *self = UNITY_LOCK_CONVERSATION (object);
 
-  (void) pspec;
 
   switch ((UnityLockConversationProps) prop_id)
     {
@@ -214,11 +207,20 @@ unity_lock_conversation_get_property (GObject    *object,
 }
 
 static void
-unity_lock_conversation_finalize (GObject *object)
+unity_lock_conversation_dispose (GObject *object)
 {
   UnityLockConversation *self = UNITY_LOCK_CONVERSATION (object);
 
   g_clear_object (&self->pam);
+
+  G_OBJECT_CLASS (unity_lock_conversation_parent_class)->dispose (object);
+}
+
+static void
+unity_lock_conversation_finalize (GObject *object)
+{
+  UnityLockConversation *self = UNITY_LOCK_CONVERSATION (object);
+
   g_clear_pointer (&self->secret, g_free);
 
   G_OBJECT_CLASS (unity_lock_conversation_parent_class)->finalize (object);
@@ -230,6 +232,7 @@ unity_lock_conversation_class_init (UnityLockConversationClass *klass)
   GObjectClass *object_class = G_OBJECT_CLASS (klass);
 
   object_class->get_property = unity_lock_conversation_get_property;
+  object_class->dispose = unity_lock_conversation_dispose;
   object_class->finalize = unity_lock_conversation_finalize;
 
   /**
@@ -247,13 +250,15 @@ unity_lock_conversation_class_init (UnityLockConversationClass *klass)
    * UnityLockConversation::prompt:
    * @self: a #UnityLockConversation.
    * @message: text PAM wants shown against the input.
+   * @visible: %TRUE when PAM will show what the user types.
    *
    * PAM is waiting for an answer. Reply with
    * unity_lock_conversation_submit().
    */
   signals[SIGNAL_PROMPT] =
     g_signal_new ("prompt", G_TYPE_FROM_CLASS (klass), G_SIGNAL_RUN_LAST,
-                  0, NULL, NULL, NULL, G_TYPE_NONE, 1, G_TYPE_STRING);
+                  0, NULL, NULL, NULL, G_TYPE_NONE, 2,
+                  G_TYPE_STRING, G_TYPE_BOOLEAN);
 
   /**
    * UnityLockConversation::message:

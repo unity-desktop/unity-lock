@@ -37,11 +37,13 @@ struct _UnityLockUserPage
   AdwAvatar           *avatar;
   GtkLabel            *name_label;
   GtkLabel            *message;
+  GtkLabel            *caps_warning;
   AdwPasswordEntryRow *password;
   AdwPreferencesGroup *unlock_group;
 
   ActUser               *user;
   UnityLockConversation *conversation;
+  gboolean               active;
 };
 
 enum {
@@ -64,8 +66,10 @@ prompt_title (const gchar *message)
   title = g_strdup (message);
   g_strstrip (title);
 
-  if (g_str_has_suffix (title, ":"))
-    title[strlen (title) - 1] = '\0';
+  gsize length = strlen (title);
+
+  while (length > 0 && title[length - 1] == ':')
+    title[--length] = '\0';
 
   g_strchomp (title);
 
@@ -73,6 +77,25 @@ prompt_title (const gchar *message)
     return g_strdup (_("Password"));
 
   return g_steal_pointer (&title);
+}
+
+static void
+sync_caps_warning (UnityLockUserPage *self)
+{
+  GdkDisplay *display  = gdk_display_get_default ();
+  GdkSeat    *seat     = display != NULL ? gdk_display_get_default_seat (display) : NULL;
+  GdkDevice  *keyboard = seat != NULL ? gdk_seat_get_keyboard (seat) : NULL;
+
+  gtk_widget_set_visible (GTK_WIDGET (self->caps_warning),
+                          keyboard != NULL && gdk_device_get_caps_lock_state (keyboard));
+}
+
+static void
+on_caps_lock_changed (GObject           *object,
+                      GParamSpec        *pspec,
+                      UnityLockUserPage *self)
+{
+  sync_caps_warning (self);
 }
 
 static void
@@ -121,7 +144,14 @@ on_prompt (UnityLockConversation *conversation,
            gboolean               visible,
            UnityLockUserPage     *self)
 {
-  g_autofree gchar *title = prompt_title (message);
+  g_autofree gchar *title = NULL;
+
+  /* PAM cannot be cancelled, so a reply can arrive after the user has gone back
+     to the clock. Ignore it rather than pull the focus to a page nobody sees. */
+  if (!self->active)
+    return;
+
+  title = prompt_title (message);
 
   adw_preferences_row_set_title (ADW_PREFERENCES_ROW (self->password), title);
   gtk_editable_set_text (GTK_EDITABLE (self->password), "");
@@ -134,6 +164,9 @@ on_message (UnityLockConversation *conversation,
             gboolean               is_error,
             UnityLockUserPage     *self)
 {
+  if (!self->active)
+    return;
+
   show_message (self, text, is_error ? "error" : "dim-label");
 }
 
@@ -149,6 +182,9 @@ on_failed (UnityLockConversation *conversation,
            const gchar           *message,
            UnityLockUserPage     *self)
 {
+  if (!self->active)
+    return;
+
   show_message (self, message ? message : _("Authentication failed"), "error");
   reset_entry (self);
   gtk_widget_grab_focus (GTK_WIDGET (self->password));
@@ -228,6 +264,8 @@ unity_lock_user_page_set_active (UnityLockUserPage *self,
 
   g_return_if_fail (UNITY_LOCK_IS_USER_PAGE (self));
 
+  self->active = active;
+
   if (active)
     {
       gtk_widget_grab_focus (GTK_WIDGET (self));
@@ -287,6 +325,15 @@ unity_lock_user_page_constructed (GObject *object)
   g_signal_connect_object (self->user, "changed",
                            G_CALLBACK (update_user), self, G_CONNECT_SWAPPED);
 
+  GdkDisplay *display  = gdk_display_get_default ();
+  GdkSeat    *seat     = display != NULL ? gdk_display_get_default_seat (display) : NULL;
+  GdkDevice  *keyboard = seat != NULL ? gdk_seat_get_keyboard (seat) : NULL;
+
+  if (keyboard != NULL)
+    g_signal_connect_object (keyboard, "notify::caps-lock-state",
+                             G_CALLBACK (on_caps_lock_changed), self, G_CONNECT_DEFAULT);
+
+  sync_caps_warning (self);
   update_user (self);
   on_busy_changed (NULL, NULL, self);
 }
@@ -295,6 +342,8 @@ static void
 unity_lock_user_page_dispose (GObject *object)
 {
   UnityLockUserPage *self = UNITY_LOCK_USER_PAGE (object);
+
+  gtk_widget_dispose_template (GTK_WIDGET (self), UNITY_LOCK_TYPE_USER_PAGE);
 
   g_clear_object (&self->conversation);
   g_clear_object (&self->user);
@@ -331,6 +380,7 @@ unity_lock_user_page_class_init (UnityLockUserPageClass *klass)
   gtk_widget_class_bind_template_child (widget_class, UnityLockUserPage, avatar);
   gtk_widget_class_bind_template_child (widget_class, UnityLockUserPage, name_label);
   gtk_widget_class_bind_template_child (widget_class, UnityLockUserPage, message);
+  gtk_widget_class_bind_template_child (widget_class, UnityLockUserPage, caps_warning);
   gtk_widget_class_bind_template_child (widget_class, UnityLockUserPage, password);
   gtk_widget_class_bind_template_child (widget_class, UnityLockUserPage, unlock_group);
   gtk_widget_class_bind_template_callback (widget_class, on_submit);

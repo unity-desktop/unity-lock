@@ -61,7 +61,9 @@ void unity_lock_user_page_type_into_entry (UnityLockUserPage *self,
  *
  * Tells the page whether it is the page the user is looking at. An active page
  * takes the keyboard focus. An inactive one clears the field, drops any message,
- * abandons the PAM conversation and gives up the focus.
+ * forgets the held secret and gives up the focus. A PAM exchange already in
+ * flight keeps running, because AstalAuthPam offers no way to stop one, so an
+ * inactive page ignores what it reports.
  */
 void unity_lock_user_page_set_active (UnityLockUserPage *self,
                                       gboolean           active);

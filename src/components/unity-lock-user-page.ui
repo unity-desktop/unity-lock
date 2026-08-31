@@ -55,56 +55,69 @@
                       <class name="unity-lock-text"/>
                     </style>
                   </object>
-            </child>
-            <child>
-              <object class="GtkLabel" id="message">
-                <property name="visible">false</property>
-                <property name="wrap">true</property>
-                <property name="justify">center</property>
-                <property name="max-width-chars">36</property>
-                <property name="halign">center</property>
-              </object>
-            </child>
-            <child>
-              <object class="AdwPreferencesGroup">
+                </child>
                 <child>
-                  <object class="AdwPasswordEntryRow" id="password">
-                    <property name="title" translatable="yes">Password</property>
-                    <signal name="entry-activated" handler="on_submit" swapped="no"/>
+                  <object class="GtkLabel" id="message">
+                    <property name="visible">false</property>
+                    <property name="wrap">true</property>
+                    <property name="justify">center</property>
+                    <property name="max-width-chars">36</property>
+                    <property name="halign">center</property>
                   </object>
                 </child>
-              </object>
-            </child>
-            <child>
-              <object class="AdwPreferencesGroup" id="unlock_group">
                 <child>
-                  <object class="AdwButtonRow" id="unlock_button">
-                    <property name="title" translatable="yes">Unlock</property>
-                    <signal name="activated" handler="on_submit" swapped="no"/>
+                  <object class="GtkLabel" id="caps_warning">
+                    <property name="visible">false</property>
+                    <property name="halign">center</property>
+                    <property name="label" translatable="yes">Caps Lock is on</property>
                     <style>
-                      <class name="suggested-action"/>
-                      <class name="body"/>
+                      <class name="warning"/>
+                      <class name="caption"/>
                     </style>
                   </object>
                 </child>
+                <child>
+                  <object class="AdwPreferencesGroup">
+                    <child>
+                      <object class="AdwPasswordEntryRow" id="password">
+                        <property name="title" translatable="yes">Password</property>
+                        <signal name="entry-activated" handler="on_submit" swapped="no"/>
+                      </object>
+                    </child>
+                  </object>
+                </child>
+                <child>
+                  <object class="AdwPreferencesGroup" id="unlock_group">
+                    <child>
+                      <object class="AdwButtonRow">
+                        <property name="title" translatable="yes">Unlock</property>
+                        <signal name="activated" handler="on_submit" swapped="no"/>
+                        <style>
+                          <class name="suggested-action"/>
+                          <class name="body"/>
+                        </style>
+                      </object>
+                    </child>
+                  </object>
+                </child>
               </object>
-            </child>
+            </property>
           </object>
-        </property>
-      </object>
         </child>
         <child type="overlay">
-          <object class="GtkButton" id="back">
+          <object class="GtkButton">
             <property name="halign">start</property>
             <property name="valign">start</property>
             <property name="margin-top">12</property>
             <property name="margin-start">12</property>
             <property name="icon-name">go-previous-symbolic</property>
-            <property name="tooltip-text" translatable="yes">Back</property>
             <property name="action-name">lock.back</property>
             <style>
               <class name="unity-lock-back"/>
             </style>
+            <accessibility>
+              <property name="label" translatable="yes">Back</property>
+            </accessibility>
           </object>
         </child>
       </object>

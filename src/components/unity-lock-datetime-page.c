@@ -33,9 +33,20 @@ struct _UnityLockDatetimePage
 G_DEFINE_FINAL_TYPE (UnityLockDatetimePage, unity_lock_datetime_page, ADW_TYPE_BIN)
 
 static void
+unity_lock_datetime_page_dispose (GObject *object)
+{
+  gtk_widget_dispose_template (GTK_WIDGET (object), UNITY_LOCK_TYPE_DATETIME_PAGE);
+
+  G_OBJECT_CLASS (unity_lock_datetime_page_parent_class)->dispose (object);
+}
+
+static void
 unity_lock_datetime_page_class_init (UnityLockDatetimePageClass *klass)
 {
+  GObjectClass *object_class = G_OBJECT_CLASS (klass);
   GtkWidgetClass *widget_class = GTK_WIDGET_CLASS (klass);
+
+  object_class->dispose = unity_lock_datetime_page_dispose;
 
   g_type_ensure (UNITY_LOCK_TYPE_DATETIME);
 

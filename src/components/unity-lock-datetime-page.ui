@@ -13,51 +13,30 @@
           </object>
         </property>
         <child type="overlay">
-          <object class="AdwBreakpointBin">
+          <object class="GtkBox">
+            <property name="orientation">vertical</property>
             <property name="hexpand">true</property>
             <property name="vexpand">true</property>
-            <property name="width-request">200</property>
-            <property name="height-request">200</property>
             <child>
-              <object class="AdwBreakpoint">
-                <condition>max-width: 600sp</condition>
-                <setter object="datetime" property="scale">7</setter>
-              </object>
-            </child>
-            <child>
-              <object class="AdwBreakpoint">
-                <condition>max-width: 400sp</condition>
-                <setter object="datetime" property="scale">4</setter>
-              </object>
-            </child>
-            <property name="child">
-              <object class="GtkBox">
-                <property name="orientation">vertical</property>
+              <object class="UnityLockDatetime" id="datetime">
                 <property name="hexpand">true</property>
                 <property name="vexpand">true</property>
-                <child>
-                  <object class="UnityLockDatetime" id="datetime">
-                    <property name="scale">10</property>
-                    <property name="hexpand">true</property>
-                    <property name="vexpand">true</property>
-                    <property name="valign">center</property>
-                  </object>
-                </child>
-                <child>
-                  <object class="GtkImage">
-                    <property name="icon-name">go-up-symbolic</property>
-                    <property name="halign">center</property>
-                    <property name="valign">end</property>
-                    <property name="pixel-size">32</property>
-                    <property name="margin-bottom">32</property>
-                    <style>
-                      <class name="unity-lock-text"/>
-                      <class name="unity-lock-hint"/>
-                    </style>
-                  </object>
-                </child>
+                <property name="valign">center</property>
               </object>
-            </property>
+            </child>
+            <child>
+              <object class="GtkImage">
+                <property name="icon-name">go-up-symbolic</property>
+                <property name="halign">center</property>
+                <property name="valign">end</property>
+                <property name="pixel-size">32</property>
+                <property name="margin-bottom">32</property>
+                <style>
+                  <class name="unity-lock-text"/>
+                  <class name="unity-lock-hint"/>
+                </style>
+              </object>
+            </child>
           </object>
         </child>
       </object>

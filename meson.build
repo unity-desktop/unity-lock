@@ -20,6 +20,7 @@ dep_pango      = dependency('pango',           version: '>= 1.56')
 dep_pangocairo = dependency('pangocairo')
 dep_astalauth  = dependency('astal-auth-0.1')
 dep_layershell = dependency('gtk4-layer-shell-0', version: '>= 1.0')
+dep_unity_platform_components = dependency('unity-platform-components')
 
 dependency('gsettings-desktop-schemas')
 
@@ -28,13 +29,10 @@ i18n  = import('i18n')
 
 gettext_package = meson.project_name()
 
-mirror_root = '/var/lib/unity-greeter'
-
 add_project_arguments(
   '-DGNOME_DESKTOP_USE_UNSTABLE_API',
   '-DGETTEXT_PACKAGE="' + gettext_package + '"',
   '-DUNITY_LOCK_LOCALEDIR="' + get_option('prefix') / get_option('localedir') + '"',
-  '-DUNITY_LOCK_MIRROR_ROOT="' + mirror_root + '"',
   '-Wno-unused-parameter',
   language: 'c',
 )

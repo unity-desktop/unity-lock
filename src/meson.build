@@ -9,6 +9,7 @@ unity_lock_deps = [
   dep_pango,
   dep_pangocairo,
   dep_layershell,
+  dep_unity_platform_components,
 ]
 
 unity_lock_sources = files(
@@ -26,18 +27,16 @@ unity_lock_resources = gnome.compile_resources(
   source_dir: ['.', meson.project_source_root() / 'data'],
 )
 
-unity_lock_link_args = [
-  '-Wl,--no-as-needed',
-  '-lgtk4-layer-shell',
-  '-Wl,--as-needed',
-]
-
 executable(
   'unity-lock',
   unity_lock_sources,
   unity_lock_resources,
   dependencies:        unity_lock_deps,
   include_directories: include_directories('.', 'auth', 'components'),
-  link_args:           unity_lock_link_args,
+  link_args:           [
+      '-Wl,--no-as-needed',
+      '-lgtk-4',
+      '-Wl,--as-needed',
+  ],
   install:             true,
 )

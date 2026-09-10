@@ -28,7 +28,7 @@ is bundled in the program, so none of them need a font installed on the host.
 - **`UnityLockBackground`**: reads the published wallpaper once, decodes it once, and shares the result with every page that draws it.
 - **`UnityLockConversation`**: sends the typed password to PAM and reports back what PAM answers.
 - **`main.c`**: makes one surface per monitor with `unity_window_present_for_each_monitor`, and quits once PAM accepts the password.
-- **Per-user wallpaper**: each user has their own lock screen picture. `unity-shell` writes it to `/var/lib/unity-greeter/<user>/background.png`, already blurred and dimmed, and the lock screen reads it back. The desktop, the login screen and the lock screen all show one image. A screen shows a plain dark background when the picture is missing.
+- **Per-user wallpaper**: each user has their own lock screen picture. `unity-shell` writes it to `$XDG_CACHE_HOME/unity-shell/background.png`, already blurred and dimmed, and the lock screen reads it back. The desktop, the login screen and the lock screen all show one image. A screen shows a plain dark background when the picture is missing.
 
 ### build
 

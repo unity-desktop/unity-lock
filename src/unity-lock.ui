@@ -2,11 +2,16 @@
 <interface>
   <requires lib="gtk" version="4.0"/>
   <requires lib="libadwaita" version="1.4"/>
-  <template class="UnityLock" parent="AdwApplicationWindow">
+  <template class="UnityLock" parent="UnityWindow">
+    <property name="stylesheet">/org/unity/lock/style.css</property>
+    <property name="namespace">unity-lock</property>
+    <property name="layer">overlay</property>
+    <property name="exclusivity">ignore</property>
+    <property name="keymode">exclusive</property>
     <style>
       <class name="unity-lock"/>
     </style>
-    <property name="content">
+    <child>
       <object class="AdwCarousel" id="carousel">
         <property name="orientation">vertical</property>
         <property name="hexpand">true</property>
@@ -21,6 +26,6 @@
           <object class="UnityLockUserPage"/>
         </child>
       </object>
-    </property>
+    </child>
   </template>
 </interface>

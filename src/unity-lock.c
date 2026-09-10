@@ -2,23 +2,12 @@
  *
  * Copyright 2026 Muqtadir
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
- *
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
 #include "unity-lock.h"
+
+#include <adwaita.h>
 
 #include "unity-lock-datetime-page.h"
 #include "unity-lock-user-page.h"
@@ -28,7 +17,7 @@
 
 struct _UnityLock
 {
-  AdwApplicationWindow parent_instance;
+  UnityWindow parent_instance;
 
   AdwCarousel *carousel;
 };
@@ -40,7 +29,7 @@ enum {
 
 static guint signals[N_SIGNALS];
 
-G_DEFINE_FINAL_TYPE (UnityLock, unity_lock, ADW_TYPE_APPLICATION_WINDOW)
+G_DEFINE_FINAL_TYPE (UnityLock, unity_lock, UNITY_TYPE_WINDOW)
 
 static UnityLockUserPage *
 user_page (UnityLock *self)
@@ -181,7 +170,7 @@ unity_lock_class_init (UnityLockClass *klass)
   g_type_ensure (UNITY_LOCK_TYPE_USER_PAGE);
 
   gtk_widget_class_set_template_from_resource (widget_class,
-                                               "/org/unity/Lock/unity-lock.ui");
+                                               "/org/unity/lock/unity-lock.ui");
   gtk_widget_class_bind_template_child (widget_class, UnityLock, carousel);
 }
 
@@ -208,7 +197,7 @@ unity_lock_init (UnityLock *self)
   gtk_widget_add_controller (GTK_WIDGET (self), GTK_EVENT_CONTROLLER (click));
 }
 
-GtkWindow *
+UnityLock *
 unity_lock_new (GtkApplication *app)
 {
   g_return_val_if_fail (GTK_IS_APPLICATION (app), NULL);

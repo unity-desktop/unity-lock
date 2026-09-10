@@ -2,25 +2,12 @@
  *
  * Copyright 2026 Muqtadir
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
- *
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
 #pragma once
 
-#include <adwaita.h>
+#include <unity-window.h>
 
 G_BEGIN_DECLS
 
@@ -36,13 +23,12 @@ G_BEGIN_DECLS
  *
  * One lock surface, covering one monitor.
  *
- * This derives from #AdwApplicationWindow rather than a layer shell window.
- * gtk_session_lock_instance_assign_window_to_monitor() gives it the
- * ext_session_lock_surface_v1 role, a Wayland surface holds one role only, and
- * that library also presents and sizes the window, so it must not be presented
- * or given a fixed size by the caller.
+ * This derives from #UnityWindow, so the surface is a `wlr-layer-shell`
+ * overlay that carries the platform stylesheet.
+ * unity_window_present_for_each_monitor() binds it to a monitor, presents it
+ * and destroys it on unplug, so the caller must not present or size it.
  */
-G_DECLARE_FINAL_TYPE (UnityLock, unity_lock, UNITY, LOCK, AdwApplicationWindow)
+G_DECLARE_FINAL_TYPE (UnityLock, unity_lock, UNITY, LOCK, UnityWindow)
 
 /**
  * unity_lock_new:
@@ -52,9 +38,8 @@ G_DECLARE_FINAL_TYPE (UnityLock, unity_lock, UNITY, LOCK, AdwApplicationWindow)
  * emits #UnityLock::unlocked once PAM accepts it, so removing a monitor never
  * takes the only prompt away with it.
  *
- * Returns: (transfer none): a new #UnityLock. Ownership passes to the session
- *   lock once the window is assigned to a monitor.
+ * Returns: (transfer none): a new #UnityLock.
  */
-GtkWindow *unity_lock_new (GtkApplication *app);
+UnityLock *unity_lock_new (GtkApplication *app);
 
 G_END_DECLS

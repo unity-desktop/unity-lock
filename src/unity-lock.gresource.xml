@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <gresources>
-  <gresource prefix="/org/unity/Lock">
+  <gresource prefix="/org/unity/lock">
     <file compressed="true" preprocess="xml-stripblanks">unity-lock.ui</file>
     <file compressed="true" preprocess="xml-stripblanks" alias="unity-lock-datetime.ui">components/unity-lock-datetime.ui</file>
     <file compressed="true" preprocess="xml-stripblanks" alias="unity-lock-datetime-page.ui">components/unity-lock-datetime-page.ui</file>
